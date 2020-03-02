@@ -1,5 +1,4 @@
 #include <iostream>
-#include <math.h>
 #include <vector>
 #include <chrono>
 #include <fstream>
@@ -10,24 +9,27 @@ const int N = 10000000;
 float v = 0.53125;
 vector<float> vct(N, v);
 
-float easy_sum(){
+float easy_sum() {
     float sum = 0;
-    for(auto val:vct)
-        sum+= val;
+    for (auto val:vct)
+        sum += val;
     return sum;
 }
+
 float *easy_sum_with_report(int step = 25000);
-float merge_sum_body( int start, int end){
-    if(start==end) return 0;
-    if(start==end-1) return vct[start];
-    int mid = start+(end-start)/2;
+
+float merge_sum_body(int start, int end) {
+    if (start == end) return 0;
+    if (start == end - 1) return vct[start];
+    int mid = start + (end - start) / 2;
     return merge_sum_body(start, mid) + merge_sum_body(mid, end);
 }
-float merge_sum(){
+
+float merge_sum() {
     return merge_sum_body(0, vct.size());
 }
 
-float kahan_sum(){
+float kahan_sum() {
     float sum = 0.0f;
     float err = 0.0f;
     for (float i : vct) {
@@ -39,23 +41,24 @@ float kahan_sum(){
     return sum;
 }
 
-void eval_sum(float eval_func()){
+void eval_sum(float eval_func()) {
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     float sum = eval_func();
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
 
-    cout<<"\nexperimentally determined x: "<< sum;
-    cout<<"\nrelative error: "<< abs((sum-v*N)/(v*N));
-    cout<<"\nabsolute error: "<< abs((sum-v*N));
-    cout<<"\nelapsed time: "<< chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[mikroseconds]" << endl;
+    cout << "\nexperimentally determined x: " << sum;
+    cout << "\nrelative error: " << abs((sum - v * N) / (v * N));
+    cout << "\nabsolute error: " << abs((sum - v * N));
+    cout << "\nelapsed time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[mikroseconds]"
+         << endl;
 }
 
 int main() {
-    cout<<"______Sum obtained using naive algorithm_____ ";
+    cout << "______Sum obtained using naive algorithm_____ ";
     eval_sum(easy_sum);
-    cout<<"\n______Sum obtained using recursive algorithm_____ ";
+    cout << "\n______Sum obtained using recursive algorithm_____ ";
     eval_sum(merge_sum);
-    cout<<"\n______Sum obtained using kahan algorithm_____ ";
+    cout << "\n______Sum obtained using kahan algorithm_____ ";
     eval_sum(kahan_sum);
 
 /*
@@ -64,19 +67,20 @@ int main() {
     int step = 25000;
     ofstream sum_error;
     sum_error.open("sum_error_progress.json");
-    sum_error <<parseArray(easy_sum_with_report(step), N/step);
+    sum_error << parseArray(easy_sum_with_report(step), N / step);
     sum_error.close();
     return 0;
 }
-float *easy_sum_with_report(int step){
-    auto *rel_err = new float[N/step];
+
+float *easy_sum_with_report(int step) {
+    auto *rel_err = new float[N / step];
     float sum = 0;
-    for(int i =0 ;i<N/step;i++){
-        for(int j=0; j<step; j++)
-            sum+=v;
-        float expected = v*(i+1)*25000;
+    for (int i = 0; i < N / step; i++) {
+        for (int j = 0; j < step; j++)
+            sum += v;
+        float expected = v * (i + 1) * 25000;
         float actual = sum;
-        rel_err[i] = abs((actual-expected)/expected);
+        rel_err[i] = abs((actual - expected) / expected);
     }
     return rel_err;
 }
