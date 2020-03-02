@@ -16,18 +16,7 @@ float easy_sum(){
         sum+= val;
     return sum;
 }
-float *sum_with_report(int step = 25000){
-    auto *rel_err = new float[N/step];
-    float sum = 0;
-    for(int i =0 ;i<N/step;i++){
-        for(int j=0; j<step; j++)
-            sum+=v;
-        float expected = v*(i+1)*25000;
-        float actual = sum;
-        rel_err[i] = abs((actual-expected)/expected);
-    }
-    return rel_err;
-}
+float *easy_sum_with_report(int step = 25000);
 float merge_sum_body( int start, int end){
     if(start==end) return 0;
     if(start==end-1) return vct[start];
@@ -36,6 +25,18 @@ float merge_sum_body( int start, int end){
 }
 float merge_sum(){
     return merge_sum_body(0, vct.size());
+}
+
+float kahan_sum(){
+    float sum = 0.0f;
+    float err = 0.0f;
+    for (float i : vct) {
+        float y = i - err;
+        float temp = sum + y;
+        err = (temp - sum) - y;
+        sum = temp;
+    }
+    return sum;
 }
 
 void eval_sum(float eval_func()){
@@ -54,6 +55,8 @@ int main() {
     eval_sum(easy_sum);
     cout<<"\n______Sum obtained using recursive algorithm_____ ";
     eval_sum(merge_sum);
+    cout<<"\n______Sum obtained using kahan algorithm_____ ";
+    eval_sum(kahan_sum);
 
 /*
  * exporting progress of relative error for naive sum algorithm to JSON file.
@@ -61,10 +64,21 @@ int main() {
     int step = 25000;
     ofstream sum_error;
     sum_error.open("sum_error_progress.json");
-    sum_error <<parseArray(sum_with_report(step), N/step);
+    sum_error <<parseArray(easy_sum_with_report(step), N/step);
     sum_error.close();
     return 0;
 }
-
+float *easy_sum_with_report(int step){
+    auto *rel_err = new float[N/step];
+    float sum = 0;
+    for(int i =0 ;i<N/step;i++){
+        for(int j=0; j<step; j++)
+            sum+=v;
+        float expected = v*(i+1)*25000;
+        float actual = sum;
+        rel_err[i] = abs((actual-expected)/expected);
+    }
+    return rel_err;
+}
 
 
