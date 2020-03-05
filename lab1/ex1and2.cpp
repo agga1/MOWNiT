@@ -67,7 +67,7 @@ int main() {
     int step = 25000;
     ofstream sum_error;
     sum_error.open("sum_error_progress.json");
-    sum_error << parseArray(easy_sum_with_report(step), N / step);
+//    sum_error << parseArray(easy_sum_with_report(step), N / step);
     sum_error.close();
     return 0;
 }
@@ -78,7 +78,7 @@ float *easy_sum_with_report(int step) {
     for (int i = 0; i < N / step; i++) {
         for (int j = 0; j < step; j++)
             sum += v;
-        float expected = v * (i + 1) * 25000;
+        float expected = v * (i + 1) * step;
         float actual = sum;
         rel_err[i] = abs((actual - expected) / expected);
     }

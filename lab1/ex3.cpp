@@ -71,17 +71,21 @@ T eta_bwd(T s, int n, bool print=false){ // Dirichlet eta function counted in de
 
 
 int main() {
-    float s[] = {2,3.6667,5,7.2,10};
-    int n[] = {50,100,200,500,1000};
+//    float s[] = {2,3.6667,5,7.2,10};
+    float s[] = {4};
+
+//    int n[] = {50,100,200,500,1000};
+    int n[] = {200};
+
     int n_nr =  (sizeof(n)/sizeof(*n));
     int s_nr =  (sizeof(n)/sizeof(*n));
 
     for(int j=0;j<s_nr;j++) {
         cout<<"\n____________Results for s= "<<s[j]<<"__________";
-        cout<<setprecision(9);
+        cout<<setprecision(7);
         for (int i = 0; i < n_nr; i++) {
-            auto resf = eta_fwd<float>(s[j], n[i]);
-            auto resb = eta_bwd<float>(s[j], n[i]);
+            auto resf = zeta_fwd<float>(s[j], n[i]);
+            auto resb = zeta_bwd<float>(s[j], n[i]);
             cout << "\n____Results for n= " << n[i] << " ____";
             cout << "\neta forward: " << resf;
             cout << "\neta backward: " << resb;
@@ -89,20 +93,20 @@ int main() {
 //            cout << "\nzeta backward: " << zeta_bwd<float>(2, n[i])-zeta_bwd<float>(7.2, 10);
         }
     }
-    cout<< "\n\n---------DOUBLE PRECISION-----------";
-    for(int j=0;j<s_nr;j++) {
-        cout<<"\n____________Results for s= "<<s[j]<<"__________";
-        cout<<setprecision(9);
-        for (int i = 0; i < n_nr; i++) {
-            auto resf = eta_fwd<double>(s[j], n[i]);
-            auto resb = eta_bwd<double>(s[j], n[i]);
-            cout << "\n____Results for n= " << n[i] << " ____";
-            cout << "\neta forward: " << resf;
-            cout << "\neta backward: " << resb;
-
+//    cout<< "\n\n---------DOUBLE PRECISION-----------";
+//    for(int j=0;j<s_nr;j++) {
+//        cout<<"\n____________Results for s= "<<s[j]<<"__________";
+//        cout<<setprecision(9);
+//        for (int i = 0; i < n_nr; i++) {
+//            auto resf = eta_fwd<double>(s[j], n[i]);
+//            auto resb = eta_bwd<double>(s[j], n[i]);
+//            cout << "\n____Results for n= " << n[i] << " ____";
+//            cout << "\neta forward: " << resf;
+//            cout << "\neta backward: " << resb;
+//
 //            cout << "\nzeta backward: " << zeta_bwd<float>(2, n[i])-zeta_bwd<float>(7.2, 10);
-        }
-    }
+//        }
+//    }
 
 
 }
