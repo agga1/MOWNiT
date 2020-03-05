@@ -3,13 +3,14 @@
 //
 #include "JSONparser.h"
 #include <iostream>
+#include <fstream>
+
 using namespace std;
-string parseArray(float *ar, int N){
-    string res="[";
-    for(int i=0;i<N-1;i++){
-        res+=to_string(ar[i])+", ";
-    }
-    res+=to_string(ar[N-1]);
-    res+="]";
-    return res;
+
+void export_to_file(std::string filename, std::string data){
+    ofstream file;
+    std::string dir = R"(D:\Agnieszka\Documents\Studia\4semestr\MOWNiT\lab1\)";
+    file.open(dir+filename);
+    file << data;
+    file.close();
 }

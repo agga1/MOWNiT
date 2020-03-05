@@ -6,5 +6,32 @@
 #define LAB1_JSONPARSER_H
 
 #include <string>
-std::string parseArray(float *ar, int N);
+#include <sstream>
+#include <iomanip>
+
+using namespace std;
+template <class T>
+string parseArray(T *ar, int N){
+    string res="[";
+    for(int i=0;i<N-1;i++){
+        res+=to_string(ar[i])+", ";
+    }
+    res+=to_string(ar[N-1]);
+    res+="]";
+    return res;
+}
+template <class T>
+string parseArrayPrecision(T *ar, int N, int prec=6){
+    ostringstream strObj;
+    strObj << fixed << setprecision(prec);
+    strObj <<"[";
+    for(int i=0;i<N-1;i++){
+        strObj <<ar[i]<<", ";
+    }
+    strObj<<ar[N-1];
+    strObj<<"]";
+    return strObj.str();
+}
+
+void export_to_file(std::string filename, std::string data);
 #endif //LAB1_JSONPARSER_H

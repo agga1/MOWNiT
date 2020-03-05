@@ -65,10 +65,7 @@ int main() {
  * exporting progress of relative error for naive sum algorithm to JSON file.
  */
     int step = 25000;
-    ofstream sum_error;
-    sum_error.open("sum_error_progress.json");
-//    sum_error << parseArray(easy_sum_with_report(step), N / step);
-    sum_error.close();
+    export_to_file("sum_error.json", parseArray(easy_sum_with_report(step), N / step));
     return 0;
 }
 

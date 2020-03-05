@@ -9,7 +9,7 @@ set(python37lib C:/Users/Agnieszka/AppData/Local/Programs/Python/Python37/libs/p
 set(python37numpy C:/Users/Agnieszka/AppData/Local/Programs/Python/Python37/Lib/site-packages/numpy/core/include)
 add_executable(ex1 ex1and2.cpp JSONparser.h JSONparser.cpp)
 add_executable(ex3 ex3.cpp JSONparser.h JSONparser.cpp)
-add_executable(ex4 ex4.cpp JSONparser.h JSONparser.cpp matplotlibcpp.h)
+add_executable(ex4 ex4.cpp JSONparser.h JSONparser.cpp)
 
 # Matplotlib
 #find_package(PythonInterp   3.7     REQUIRED)
