@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
 template <class T>
@@ -17,6 +18,29 @@ string parseArray(T *ar, int N){
         res+=to_string(ar[i])+", ";
     }
     res+=to_string(ar[N-1]);
+    res+="]";
+    return res;
+}
+template <class T>
+string parseVector(vector<T> vct){
+    string res="[";
+    for(auto el:vct){
+        res+=to_string(el)+", ";
+    }
+    res.pop_back();
+    res.pop_back();
+    res+="]";
+    return res;
+}
+template <class T>
+string parseVectorOfVs(vector<vector<T>> vcts){
+    string res="[";
+    for(auto v: vcts){
+        res += parseVector(v);
+        res+= ", ";
+    }
+    res.pop_back();
+    res.pop_back();
     res+="]";
     return res;
 }

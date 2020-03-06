@@ -66,6 +66,9 @@ int main() {
  */
     int step = 25000;
     export_to_file("sum_error.json", parseArray(easy_sum_with_report(step), N / step));
+    int *xs = new int[N/step];
+    for(int i=0;i<N/step;i++) xs[i] = (i+1)*step;
+    export_to_file("sum_error_xs.json", parseArray(xs, N / step));
     return 0;
 }
 
