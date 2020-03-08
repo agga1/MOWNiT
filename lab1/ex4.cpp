@@ -8,12 +8,13 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <cassert>
 #include "JSONparser.h"
 using namespace std;
 //for each r in rs calculate values to which xn converges
-vector<vector<float>> logistic_map_bif_diagram(float x0, const float *rs, int rs_len){ //
+vector<vector<float>> logistic_map_bif_diagram(float x0, const float *rs, int rs_len, int height=100){ //
     vector<vector<float>> bif_diagram;
-    bif_diagram.resize(static_cast<const unsigned int>(rs_len), std::vector<float>(100));
+    bif_diagram.resize(static_cast<const unsigned int>(rs_len), std::vector<float>(height));
     for(int i=0;i<rs_len;i++){
         float r  = rs[i];
         cout<<"\nr="<<r<<" x0="<<x0;
@@ -22,7 +23,7 @@ vector<vector<float>> logistic_map_bif_diagram(float x0, const float *rs, int rs
             xn = r*xn*(1-xn);
         }
         cout<<"\nafter 200 iter xn = "<<xn;
-        for(int j=0; j<100;j++){
+        for(int j=0; j<height;j++){
             xn = r*xn*(1-xn);
             bif_diagram[i][j]=(xn);
         }
@@ -38,40 +39,60 @@ void logistic_map_trajectory(T x0, T r, T *res, int res_len){
     }
 }
 template <class T>
-int dist_to_0(T x0, T r=0.4){
+int dist_to_0(T x0, T r=4.0f){
     int it = 0;
     T xprev =  x0;
     T xcurr;
     while(xprev>0){
-        xcurr = xprev*(1-xprev)*r;
+        xcurr = r*xprev*(1-xprev);
         xprev = xcurr;
         it++;
-//        if(it%10==0) cout<<it<<" "<<xprev<<endl;
-//        if(it>100) break;
+        if(it==559) cout<<it<<" "<<xprev<<endl;
+        if(it>10000) break;
     }
     return it;
 }
-void plot_bif_diagram(int rs_len=20, float x0=0.7);
+float logistic(float x, float r){
+    return r*x*(1-x);
+}
+int dist_to_0f(float x0, float r=4.0f){
+    int it = 0;
+    float x =  x0;
+    while(x>0.0f){
+        x = logistic(x, r);
+        it++;
+        if(it>10000) break;
+    }
+    return it;
+}
+void plot_bif_diagram(int rs_len=20, int height=100, float x0=0.7);
 void compare_trajectories(float x0, float r, int N=70);
 void distances_to_zero_r4(int nr_of_x0s=10);
 
 int main(){
+    assert(sizeof(float) == 4);
+    float n;
 
     // compare trajectories between single and double precision
     float x0 = 0.7f, r=3.75f;
     compare_trajectories(x0, r);
-    plot_bif_diagram(20, x0);
-    cout<<"done";
-//    distances_to_zero_r4();
 
+    // deprecated-- see lab1vis.ipynb
+    plot_bif_diagram(500, 500, x0);
+
+    for(int i =0; i<100;i++){
+        float x0 = (float)i/100;
+        cout<<x0<<" "<<dist_to_0f(x0, 4)<<endl;
+    }
 
     // counting nr of iterations needed for reaching 0 for r=4 and different x0s (single prec.)
 
 }
-void plot_bif_diagram(int rs_len, float x0){
+// density of xs, ys, and x0
+void plot_bif_diagram(int rs_len, int height, float x0){
     auto *rs = new float[rs_len];
     for(int i=0;i<rs_len;i++) rs[i]=1+3.0f*i/rs_len;
-    vector<vector<float>> bif_diag = logistic_map_bif_diagram(x0, rs, rs_len);
+    vector<vector<float>> bif_diag = logistic_map_bif_diagram(x0, rs, rs_len, height);
     stringstream stream;
     stream << fixed << setprecision(2) << x0;
     string filename = (string)"bif_diagram"+stream.str()+".json";

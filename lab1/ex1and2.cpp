@@ -7,7 +7,8 @@ using namespace std;
 
 const int N = 10000000;
 float v = 0.53125;
-vector<float> vct(N, v);
+//float v = 0.207489;
+vector<float> vct(N, v);                    // NOLINT(cert-err58-cpp)
 
 float easy_sum() {
     float sum = 0;
@@ -17,6 +18,7 @@ float easy_sum() {
 }
 
 float *easy_sum_with_report(int step = 25000);
+
 
 float merge_sum_body(int start, int end) {
     if (start == end) return 0;
@@ -49,14 +51,19 @@ void eval_sum(float eval_func()) {
     cout << "\nexperimentally determined x: " << sum;
     cout << "\nrelative error: " << abs((sum - v * N) / (v * N));
     cout << "\nabsolute error: " << abs((sum - v * N));
+//    cout<<"given x: "<<v;
     cout << "\nelapsed time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[mikroseconds]"
          << endl;
 }
 
 int main() {
-    cout << "______Sum obtained using naive algorithm_____ ";
+//    cout << "______Sum obtained using naive algorithm_____ ";
+    cout << "______naive algorithm_____ ";
+
     eval_sum(easy_sum);
-    cout << "\n______Sum obtained using recursive algorithm_____ ";
+//    cout << "\n______Sum obtained using recursive algorithm_____ ";
+    cout << "\n______recursive algorithm_____ ";
+
     eval_sum(merge_sum);
     cout << "\n______Sum obtained using kahan algorithm_____ ";
     eval_sum(kahan_sum);

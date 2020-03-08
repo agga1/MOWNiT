@@ -3,3 +3,5 @@
 **/cmake-build-relwithdebinfo
 **/.idea
 .ipynb_checkpoints/*
+**/venv2/*
+**/venv/*
