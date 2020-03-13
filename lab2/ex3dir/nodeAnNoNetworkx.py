@@ -1,6 +1,9 @@
 import numpy as np
 from typing import List
 
+from ex3dir.readGraph import load_weighted_graph
+
+
 class Node:
     def __init__(self, idx):
         self.idx = idx
