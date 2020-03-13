@@ -1,20 +1,33 @@
 from ex3dir.readGraph import *
 import numpy as np
+import networkx as nx
+""" finds voltages on each node calculated using node analysis method """
+def node_analysisNx(G: nx.Graph):
+    A = np.zeros(shape=(len(G), len(G)))
+    B = np.array([0]*len(G))
+    ns = G.nodes
+    for idx in ns:
+        if ns[idx]['V'] is not None:
+            A[idx][idx] = 1
+            B[idx] = ns[idx]['V']
+        else:
+            for neigh in G[idx]:  # neigh = (v_idx, edge_weight)
+                w = G[idx][neigh]['weight']
+                A[idx][idx] += 1./w
+                A[idx][neigh] -= 1./w
+    Vs = np.linalg.solve(A, B)
+    for idx in ns:
+        ns[idx]['V'] = Vs[idx]
+    return G
 
-G = load_and_create_nodes("./graphs/cycle5")
-print("--!WARNING!-- vertices nr from 1..n")
+
+print("--!WARNING!-- current input type: first vertex with idx 0")
 s, t, E = [int(x) for x in input("enter s, t and E values (separated by space)").split()]
-# print(s+2)
-G[s].V = E
-G[t].V = 0
-print([G[x] for x in range(1, len(G))])
+Gnx = toNxGraph0("./graphs/cycle5")
+Gnx.nodes[s]['V'] = E
+Gnx.nodes[t]['V'] = 0
 
-"""
-create matrix VxV , V- nr of nodes in graph
-"""
-def node_analysis(G: List[Node])-> List[List[float]]:
+Gnx = node_analysisNx(Gnx)
+print(*[Gnx.nodes[x] for x in Gnx.nodes])
 
-    for node in G:
-        if(node.V is not None):
-            continue
 

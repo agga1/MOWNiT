@@ -1,6 +1,6 @@
 from typing import List, Tuple
-from ex3dir.Node import Node
 
+import networkx as nx
 def load_weighted_graph(name: str) -> Tuple[int, List]:
     """Load a graph in the DIMACS ascii format (with weights) from
      the file "name" and return it as a list of sets
@@ -28,15 +28,19 @@ def load_weighted_graph(name: str) -> Tuple[int, List]:
     f.close()
     return V, L
 
-
-def create_nodes(V, L) -> List[Node]:
-    G = [None] + [Node(i) for i in range(1, V + 1)]  # żeby móc indeksować numerem wierzchołka
-
+def toNxGraph0(name):
+    V, L = load_weighted_graph(name)
+    G = nx.Graph()
+    G.add_nodes_from([x for x in range(0, V)])
     for (u, v, weight) in L:
-        G[u].connect_to(v, weight)
-        G[v].connect_to(u, weight)
+        G.add_edge(u-1, v-1, weight=weight)
+    nx.set_node_attributes(G, None, 'V')
     return G
 
-def load_and_create_nodes(name:str):
+def toNxGraph1(name):
     V, L = load_weighted_graph(name)
-    return create_nodes(V, L)
+    G = nx.Graph()
+    G.add_nodes_from([x for x in range(1, V+1)])
+    G.add_weighted_edges_from(L)
+    nx.set_node_attributes(G, None, 'V')
+    return G
