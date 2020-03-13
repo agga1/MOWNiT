@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import networkx as nx
+from random import random
 def load_weighted_graph(name: str) -> Tuple[int, List]:
     """Load a graph in the DIMACS ascii format (with weights) from
      the file "name" and return it as a list of sets
@@ -27,19 +28,19 @@ def load_weighted_graph(name: str) -> Tuple[int, List]:
     f.close()
     return V, L
 
-def toNxGraph0(name):
+def toNxGraph0(name: str):
     V, L = load_weighted_graph(name)
     G = nx.Graph()
     G.add_nodes_from([x for x in range(0, V)])
     for (u, v, weight) in L:
-        G.add_edge(u-1, v-1, weight=weight)
+        G.add_edge(u-1, v-1, weight=weight, current=0)
     nx.set_node_attributes(G, None, 'V')
+    nx.set_node_attributes(G, '#dabb69', 'color')
     return G
 
-def toNxGraph1(name):
-    V, L = load_weighted_graph(name)
-    G = nx.Graph()
-    G.add_nodes_from([x for x in range(1, V+1)])
-    G.add_weighted_edges_from(L)
+def add_attr(G: nx.Graph):
+    nx.set_edge_attributes(G, 0, 'weight')
+    for (u, v) in G.edges():
+        G[u][v]['weight'] = random()*20
     nx.set_node_attributes(G, None, 'V')
-    return G
+    nx.set_node_attributes(G, '#dabb69', 'color')

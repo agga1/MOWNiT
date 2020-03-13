@@ -18,4 +18,7 @@ def node_analysisNx(G: nx.Graph):
     Vs = np.linalg.solve(A, B)
     for idx in ns:
         ns[idx]['V'] = Vs[idx]
-    return G
+
+def update_current(G: nx.Graph):
+    for (u, v, props) in G.edges(data=True):
+        props['current'] = abs(G.nodes[u]['V']-G.nodes[v]['V'])/props['weight']
