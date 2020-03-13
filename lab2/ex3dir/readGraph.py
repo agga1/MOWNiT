@@ -1,5 +1,5 @@
 from typing import List, Tuple
-
+from ex3dir.nodeAnNoNetworkx import Node
 import networkx as nx
 def load_weighted_graph(name: str) -> Tuple[int, List]:
     """Load a graph in the DIMACS ascii format (with weights) from

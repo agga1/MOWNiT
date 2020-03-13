@@ -1,6 +1,6 @@
-from ex3dir.readGraph import *
 import numpy as np
 import networkx as nx
+
 """ finds voltages on each node calculated using node analysis method """
 def node_analysisNx(G: nx.Graph):
     A = np.zeros(shape=(len(G), len(G)))
@@ -19,15 +19,3 @@ def node_analysisNx(G: nx.Graph):
     for idx in ns:
         ns[idx]['V'] = Vs[idx]
     return G
-
-
-print("--!WARNING!-- current input type: first vertex with idx 0")
-s, t, E = [int(x) for x in input("enter s, t and E values (separated by space)").split()]
-Gnx = toNxGraph0("./graphs/cycle5")
-Gnx.nodes[s]['V'] = E
-Gnx.nodes[t]['V'] = 0
-
-Gnx = node_analysisNx(Gnx)
-print(*[Gnx.nodes[x] for x in Gnx.nodes])
-
-
