@@ -41,6 +41,7 @@ xs =gauss_jordan(m)
 endMy = perf_counter()
 print(xs)
 print(endMy-startMy)
+
 """
 3.wystarczy albo kirch albo wezly
 brakuje m-n+1 cyklow prostych networkx do cyklow

@@ -1,6 +1,8 @@
 import numpy as np
 import networkx as nx
 
+from ex3dir.readGraph import add_attr
+
 """ finds voltages on each node calculated using node analysis method """
 def node_analysisNx(G: nx.Graph):
     A = np.zeros(shape=(len(G), len(G)))

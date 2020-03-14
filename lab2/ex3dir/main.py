@@ -1,9 +1,9 @@
 from ex3dir.nodeAnalysis import *
 from ex3dir.readGraph import *
 
-# Gnx = toNxGraph0("./graphs/cycle5")
+# Gnx = toNxGraph0("./graphs/simple5")
 # Gnx = nx.grid_2d_graph(5, 6)
-Gnx = nx.fast_gnp_random_graph(20, 0.2)
+Gnx = nx.fast_gnp_random_graph(10, 0.2)
 add_attr(Gnx)
 # for idx, val in list(Gnx.nodes()):
 #     print(idx, val)
