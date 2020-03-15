@@ -2,6 +2,6 @@
 **/cmake-build-release
 **/cmake-build-relwithdebinfo
 **/.idea
-.ipynb_checkpoints/*
+**/.ipynb_checkpoints/*
 **/venv2/*
 **/venv/*
