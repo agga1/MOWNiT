@@ -3,6 +3,9 @@ import numpy as np
 import typing
 from time import perf_counter
 
+from time_eval import time_eval
+
+
 def gauss_jordan(m: np.array, eps = 1.0/(10**10)):
     (h, w) = (m.shape[0], m.shape[1])
     for y in range(0, h):
@@ -30,17 +33,15 @@ def gauss_jordan(m: np.array, eps = 1.0/(10**10)):
 
 
 m=np.array([[1.1, 2.2, 4.0, 2.0],[3.3, 4.4, 5.0, 1.0], [2.2, 4.4, 5.5, 6.6]])
+m=np.random.rand(500, 501)
+m=10*m
 A=m[:, :-1]
 B=m[:, -1]
-startLib = perf_counter()
-print(np.linalg.solve(A, B))
-endLib = perf_counter()
-print(endLib-startLib)
-startMy = perf_counter()
-xs =gauss_jordan(m)
-endMy = perf_counter()
-print(xs)
-print(endMy-startMy)
+print("here")
+
+time_eval(gauss_jordan, [m], "my jordan", 1)
+time_eval(np.linalg.solve, [A, B], "library function", 1)
+
 
 """
 3.wystarczy albo kirch albo wezly
