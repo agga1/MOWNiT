@@ -1,14 +1,12 @@
 import math
 import decimal as dec
 import numpy as np
-from typing import List, Callable
-
-from testFunc import f4, f1
+from typing import List, Callable, Tuple
 
 max_iter = 100000
 
 
-def bisection(f: Callable, prec: int, span: List, eps):
+def bisection(f: Callable, prec: int, span: List, eps) -> Tuple[dec.Decimal, int]:
     """
     :param prec: minimum nr of significant numbers
     :param span: [a, b]

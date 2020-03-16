@@ -1,11 +1,10 @@
 import math
 import decimal as dec
-import numpy as np
-from typing import List, Callable
+from typing import List, Callable, Tuple
 
 max_iter = 100000
 
-def newton(fder: Callable, f: Callable, prec: int, span: List, eps: float, max_iter=max_iter):
+def newton(fder: Callable, f: Callable, prec: int, span: List, eps: float, max_iter=max_iter)  -> Tuple[dec.Decimal, int]:
     if fder is None:
         raise Exception("derivative not given")
 
