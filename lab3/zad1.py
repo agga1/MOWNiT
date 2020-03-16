@@ -16,16 +16,15 @@ def bisection(f: Callable, prec: int, span: List, eps):
     :return: x, where f(x)-0 < eps
     """
     a, b = span
+    dec.getcontext().prec = prec
 
     if f(a) * f(b) > 0:
-        print("same sign at both ends!")
-        return
+        raise Exception("same sign at both ends!")
 
     asc = True  # f(a)<0 and f(b)>0
     if f(a) > f(b):
         asc = False  # f(a)>0 and f(b)<0
 
-    dec.getcontext().prec = prec
     error = dec.Decimal(b) - dec.Decimal(a)  # current [a,b] interval length
     iter_nr = 0
     while not (math.isclose(error, 0, abs_tol=eps) or iter_nr > max_iter):
@@ -50,9 +49,3 @@ def expected_iter(span, eps):
     expected_iter = math.ceil(np.log((a + b) / eps) / np.log(2))
     return expected_iter
 
-
-# res, iter, exp = bisection(f4,34, [1.1234567,4],  1e-33)
-res, iter = bisection(f1, 50, [1.5 * math.pi, 2 * math.pi], 1e-33)
-print(res, iter)
-
-# print_func_res(bisection, f1, 50, [1.5 * math.pi, 2 * math.pi], 1e-33)

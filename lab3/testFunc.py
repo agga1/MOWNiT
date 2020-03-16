@@ -18,6 +18,8 @@ def f2(x):
 
 
 def f2der(x):
+    if math.isclose(x, 0.0, abs_tol=1e-9):
+        return dec.Decimal(-10000000)
     return dec.Decimal(-1/x**2) - dec.Decimal(1 / math.cos(x)**2)
 
 
