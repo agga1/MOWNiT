@@ -33,4 +33,4 @@ for i in range(5):
     m = 10 * m
     n = m.copy()
     time_eval(gauss_jordan, [m], "my jordan", 1, True, True)
-    time_eval(np.linalg.solve, [n[:, :-1], n[:, -1]], "library function", 1, True, True)
+    time_eval(np.linalg.solve, [n[:, :-1], n[:, -1]], "linalg.solve", 1, True, True)
