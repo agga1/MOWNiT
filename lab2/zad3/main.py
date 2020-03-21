@@ -1,3 +1,4 @@
+from zad3.checker import check
 from zad3.nodeAnalysis import *
 from zad3.readGraph import *
 
@@ -18,6 +19,7 @@ node_analysisNx(Gnx)
 G = build_directed(Gnx, with_voltage=True)
 print(list(G.edges(data=True)))
 print(G.nodes(data=True))
+print(check(G))
 
 """
 3.wystarczy albo kirch albo wezly
