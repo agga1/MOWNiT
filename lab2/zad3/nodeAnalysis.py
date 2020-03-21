@@ -29,8 +29,8 @@ def node_analysisNx(G: nx.Graph, shape=None):
         ns[idx]['V'] = Vs[normalize(idx, shape)]
 
 def update_current(G: nx.Graph):
-    for (u, v, props) in G.edges(data=True):
-        props['current'] = abs(G.nodes[u]['V']-G.nodes[v]['V'])/props['weight']
+    for (u, v, attrs) in G.edges(data=True):
+        attrs['current'] = abs(G.nodes[u]['V']-G.nodes[v]['V'])/attrs['weight']
 
 
 def build_directed(G: nx.Graph, with_voltage=False):
@@ -40,8 +40,8 @@ def build_directed(G: nx.Graph, with_voltage=False):
     nx.set_node_attributes(GDir, dict(G.nodes(data='color', default='#dabb69')), 'color')
     if with_voltage:
         nx.set_node_attributes(GDir, dict(G.nodes(data='V', default=0)), 'V')
-    for (u, v, props) in G.edges(data=True):
-        I = (G.nodes[u]['V']-G.nodes[v]['V'])/props['weight']
+    for (u, v, attrs) in G.edges(data=True):
+        I = (G.nodes[u]['V']-G.nodes[v]['V'])/attrs['weight']
         if I > 0:
             GDir.add_edge(u, v, current=abs(I))
         else:
