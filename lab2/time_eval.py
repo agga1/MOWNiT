@@ -1,7 +1,7 @@
 from typing import Callable, List
 from time import perf_counter, time, process_time
 
-def time_eval(func: Callable, args: List, name="", times=10, print_res=False):
+def time_eval(func: Callable, args: List, name="", times=10, print_res=False, only_actual=False):
     """
     :param func: function to evaluate based on {@param times} runs
     :param args: func arguments
@@ -22,8 +22,9 @@ def time_eval(func: Callable, args: List, name="", times=10, print_res=False):
     avg_t = (end_t-start_t)/times
     avg_pt = (end_pt-start_pt)/times
     if print_res:
-        print(res[0])
-    print(name, " running time actual: ", avg_t)
-    print("process time: ", avg_pt)
-    print("user time: ", avg_pc)
+        print("first 5 results: ",res[:5])
+    print(name, "time: ", avg_t)
+    if not only_actual:
+        print("process time: ", avg_pt)
+        print("user time: ", avg_pc)
     return res
