@@ -1,5 +1,5 @@
-from ex3dir.nodeAnalysis import *
-from ex3dir.readGraph import *
+from zad3.nodeAnalysis import *
+from zad3.readGraph import *
 
 # Gnx = toNxGraph0("./graphs/simple5")
 # Gnx = nx.grid_2d_graph(5, 6)
@@ -17,3 +17,12 @@ node_analysisNx(Gnx)
 # print(*[Gnx.nodes[x] for x in Gnx.nodes])
 update_current(Gnx)
 print(list(Gnx.edges(data=True)))
+
+"""
+3.wystarczy albo kirch albo wezly
+brakuje m-n+1 cyklow prostych networkx do cyklow
+networkx -> get random graph
+jet color map (prąd wysoki - czerwony niski -nieb
+napisz skrypt sprawdzający sume napiec (czy 0)- czy poprawny alg
+uklady rownan nadokreslone
+"""
