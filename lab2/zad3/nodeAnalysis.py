@@ -31,3 +31,19 @@ def node_analysisNx(G: nx.Graph, shape=None):
 def update_current(G: nx.Graph):
     for (u, v, props) in G.edges(data=True):
         props['current'] = abs(G.nodes[u]['V']-G.nodes[v]['V'])/props['weight']
+
+
+def build_directed(G: nx.Graph, with_voltage=False):
+    """ build directed graph based on current flowing in each edge"""
+    GDir = nx.DiGraph()
+    GDir.add_nodes_from(G.nodes())
+    nx.set_node_attributes(GDir, dict(G.nodes(data='color', default='#dabb69')), 'color')
+    if with_voltage:
+        nx.set_node_attributes(GDir, dict(G.nodes(data='V', default=0)), 'V')
+    for (u, v, props) in G.edges(data=True):
+        I = (G.nodes[u]['V']-G.nodes[v]['V'])/props['weight']
+        if I > 0:
+            GDir.add_edge(u, v, current=abs(I))
+        else:
+            GDir.add_edge(v, u, current=abs(I))
+    return GDir

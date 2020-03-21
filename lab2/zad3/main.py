@@ -1,10 +1,10 @@
 from zad3.nodeAnalysis import *
 from zad3.readGraph import *
 
-# Gnx = toNxGraph0("./graphs/simple5")
+Gnx = toNxGraph0("./graphs/cycle5")
 # Gnx = nx.grid_2d_graph(5, 6)
-Gnx = nx.fast_gnp_random_graph(10, 0.2)
-add_attr(Gnx)
+# Gnx = nx.fast_gnp_random_graph(10, 0.2)
+# add_attr(Gnx)
 # for idx, val in list(Gnx.nodes()):
 #     print(idx, val)
 # print(Gnx.nodes())
@@ -14,9 +14,10 @@ Gnx.nodes[t]['V'] = 0
 Gnx.nodes[s]['V'] = E
 
 node_analysisNx(Gnx)
-# print(*[Gnx.nodes[x] for x in Gnx.nodes])
-update_current(Gnx)
-print(list(Gnx.edges(data=True)))
+# update_current(Gnx)
+G = build_directed(Gnx, with_voltage=True)
+print(list(G.edges(data=True)))
+print(G.nodes(data=True))
 
 """
 3.wystarczy albo kirch albo wezly
