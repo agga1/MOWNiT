@@ -1,9 +1,6 @@
 import numpy as np
-from numpy.linalg import inv
-from scipy import linalg
 
-
-def AtoLUP(A: np.array):
+def AtoLU(A: np.array):
     U = np.array(A)
     assert U.shape[0] == U.shape[1]
     n = U.shape[0]
@@ -22,38 +19,35 @@ def AtoLUP(A: np.array):
         L[y][y] = 1
         for row in range(y+1, n):    # Eliminate column y
             factor = U[row][y] / U[y][y]
-            for el in range(y, n):
-                U[row][el] -= U[y][el] * factor
+            U[row, y:] -= U[y, y:] * factor
             L[row][y] = factor
-    return L, U, P.transpose()
+    return P.transpose()@L, U
 
 
-def checkALUP(A, L, U, P):
-    print(L.dot(U))
-    print(P.dot(A))
-    # checkEquals(L.dot(U), P.dot(A))
+def checkALU(A, L, U, eps = 1e-10):
+    Check = abs(A - L@U) <eps
+    return np.all(Check)
 
 
-def checkEquals(A, B):
-    print(A==B)
-size = 5
-A = np.random.rand(size, size)
-A = 10 * A
+def factorizeAndCheck(n: int, printLU=True):
+    """
+    prints L, U and if LU factorization of nxn matrix is correct
+    """
+    A = np.random.rand(n, n)
+    A = 10 * A
 
-# L, U, P =AtoLUP(A)
-# print(L)
-# print(U)
-# print(P)
-P, L, U =linalg.lu(A)
-# print(L)
-# print(U)
-# print(P)
-print(P@L@U)
-print(A)
-# print(P.dot(A))
+    L, U =AtoLU(A)
+    if printLU:
+        np.set_printoptions(precision=6, suppress=True)
+        print("L:\n", L)
+        print("U:\n",U)
+    ok = checkALU(A, L, U)
+    print("correct" if ok else "incorrect")
 
-# L, U, P =AtoLUP(A)
-# checkALUP(A, L, U, P)
+factorizeAndCheck(6)
+factorizeAndCheck(100, False)
+factorizeAndCheck(200, False)
+factorizeAndCheck(300, False)
 
 def AtoLUinPlace(m: np.array):
     if isinstance(m , list):
@@ -72,3 +66,14 @@ def AtoLUinPlace(m: np.array):
                 m[row][el] -= m[y][el] * factor
             m[row][y] = factor
     return m
+
+""" check with scipy """
+# A = np.random.rand(10, 10)
+# A = 10 * A
+# P, L, U =linalg.lu(A)
+# # print(L)
+# # print(U)
+# # print(P)
+# print(P@L@U)
+# print(A)
+# print(P.dot(A))
