@@ -34,6 +34,7 @@ def factorizeAndCheck(n: int, printLU=True):
     """
     prints L, U and whether LU factorization of nxn matrix is correct
     """
+    print(f"results for A {n}x{n}")
     A = np.random.rand(n, n)
     A = 10 * A
 
