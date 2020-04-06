@@ -1,3 +1,8 @@
-# Laboratory 3 - Circuit Analysis
+# Laboratory 3 
 
-Algorithm calculating current flow in each edge of given circuit (represented as netwrokx graph, where resistance is represented as edge weight). 
+## 1 - Bisection method 
+Implementation of bisection method for finding roots of continuous functions.
+## 2 - Newton–Raphson method
+Implementation of Newton–Raphson method for finding roots of continuous functions.
+## 3 - Circuit Analysis
+Algorithm calculating current flow in given circuit (represented as netwrokx graph, where resistance is represented as edge weight). 
