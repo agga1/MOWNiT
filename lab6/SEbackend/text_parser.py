@@ -1,9 +1,7 @@
 # simple wiki dump converted to plain text provided by:
 # https://github.com/LGDoor/Dump-of-Simple-English-Wiki
 import os
-from Article import Article
-from stopwords import stopwords
-from nltk.stem import PorterStemmer
+from Text import Article
 from typing import List
 
 # chars forbidden in windows filenames (added () for clarity )
@@ -62,28 +60,9 @@ def file_to_article(article_path: str) -> Article:
     """
     file = open(article_path, "r", encoding="utf8")
     title = file.readline()[:-1]  # no \n
-
-    # tokenizing
-    content = "".join(file.readlines()).lower()
-    for ch in ['.', ',', ':', '(', ')', '"', "'s"]:
-        content = content.replace(ch, "")
-    words = content.split()
-
-    # removing stop words
-    filered_words = []
-    for w in words:
-        if w not in stopwords:
-            filered_words.append(w)
-
-    # stemming
-    ps = PorterStemmer()
-    stemmed_words = []
-    for w in filered_words:
-        stemmed_words.append(ps.stem(w))
-
-    article = Article(title, stemmed_words, article_path)
+    text = "".join(file.readlines())
+    article = Article(title, text, article_path)
     return article
-
 
 
 
