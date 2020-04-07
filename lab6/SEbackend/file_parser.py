@@ -1,31 +1,13 @@
 # simple wiki dump converted to plain text provided by:
 # https://github.com/LGDoor/Dump-of-Simple-English-Wiki
 import os
-# chars forbidden in windows filenames (added () for clarity )
-windows_forbidden = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|", "(", ")"]
+from Article import Article
+from stopwords import stopwords
+from nltk.stem import PorterStemmer
 from typing import List
 
-class Article:
-    def __init__(self, title: str, words: List[str], link: str = None):
-        self.title = title
-        self.link = link  # absolute path to the full article in txt form
-        self.words = words  # list of words
-        self.BOW = None  # created when dictionary will be provided
-        self.dictionary = None
-
-    def convert_to_BOW(self, dictionary):
-        # TODO generate BOW
-        # self.dict..=dict..
-        # set self.words = None
-        pass
-
-    def __repr__(self):
-        return self.title
-
-    def text_to_words(self, content):
-        words = content.split()
-        return words
-
+# chars forbidden in windows filenames (added () for clarity )
+windows_forbidden = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|", "(", ")"]
 
 def parse_to_separate_files(filename, max_count=10000):
     """
@@ -48,7 +30,7 @@ def parse_to_separate_files(filename, max_count=10000):
         if title is None:   # title
             title = line
             if any(x in title for x in windows_forbidden):
-                save = False             # omits any articles with characters forbidden in Windows file names
+                save = False
         elif line != "\n":  # content
             content += line
         else:               # end of content
@@ -79,25 +61,29 @@ def file_to_article(article_path: str) -> Article:
     represented as list of words (later to be converted as BOW, when dictionary will be built)
     """
     file = open(article_path, "r", encoding="utf8")
-
     title = file.readline()[:-1]  # no \n
+
+    # tokenizing
     content = "".join(file.readlines()).lower()
-    for ch in ['.', ',', ':', '(', ')', '"']:
+    for ch in ['.', ',', ':', '(', ')', '"', "'s"]:
         content = content.replace(ch, "")
     words = content.split()
-    # TODO remove stop words
-    # TODO stemming
-    article = Article(title, words, article_path)
+
+    # removing stop words
+    filered_words = []
+    for w in words:
+        if w not in stopwords:
+            filered_words.append(w)
+
+    # stemming
+    ps = PorterStemmer()
+    stemmed_words = []
+    for w in filered_words:
+        stemmed_words.append(ps.stem(w))
+
+    article = Article(title, stemmed_words, article_path)
     return article
 
 
-def create_dictionray(articles):
-    """
-    creates dictionary of all words which appear in articles
-    :return: dictionary {"word": idx, ...}
-    """
-    # TODO union of article.words for article in articles
 
 
-wikipath = parse_to_separate_files("simple_wiki.txt", max_count=2)
-files_to_articles(wikipath)
