@@ -3,12 +3,21 @@
 import os
 # chars forbidden in windows filenames (added () for clarity )
 windows_forbidden = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|", "(", ")"]
-
+from typing import List
 
 class Article:
-    def __init__(self, title: str, content: str):
+    def __init__(self, title: str, words: List[str], link: str = None):
         self.title = title
-        self.words = self.text_to_words(content)
+        self.link = link  # absolute path to the full article in txt form
+        self.words = words  # list of words
+        self.BOW = None  # created when dictionary will be provided
+        self.dictionary = None
+
+    def convert_to_BOW(self, dictionary):
+        # TODO generate BOW
+        # self.dict..=dict..
+        # set self.words = None
+        pass
 
     def __repr__(self):
         return self.title
@@ -56,14 +65,39 @@ def parse_to_separate_files(filename, max_count=10000):
     return out_dir
 
 
-def files_to_articles(files_dir):
+def files_to_articles(files_dir: str) -> List[Article]:
+    articles = []
+    for article_file in os.listdir(files_dir):
+        article_path = os.path.join(files_dir, article_file)
+        articles.append(file_to_article(article_path))
+    return articles
+
+
+def file_to_article(article_path: str) -> Article:
     """
-    creates Article object for each file in provided files_dir
-    :return: list of Article objects
+    creates Article object based on txt file:
+    represented as list of words (later to be converted as BOW, when dictionary will be built)
     """
+    file = open(article_path, "r", encoding="utf8")
+
+    title = file.readline()[:-1]  # no \n
+    content = "".join(file.readlines()).lower()
+    for ch in ['.', ',', ':', '(', ')', '"']:
+        content = content.replace(ch, "")
+    words = content.split()
+    # TODO remove stop words
+    # TODO stemming
+    article = Article(title, words, article_path)
+    return article
 
 
+def create_dictionray(articles):
+    """
+    creates dictionary of all words which appear in articles
+    :return: dictionary {"word": idx, ...}
+    """
+    # TODO union of article.words for article in articles
 
 
-wikipath = parse_to_separate_files("simple_wiki.txt", max_count=2000)
-print(wikipath)
+wikipath = parse_to_separate_files("simple_wiki.txt", max_count=2)
+files_to_articles(wikipath)
