@@ -41,6 +41,7 @@ def factorizeAndCheck(n: int, printLU=True):
     L, U, P =AtoLUP(A)
     if printLU:
         np.set_printoptions(precision=6, suppress=True)
+        print("P:\n",P)
         print("L:\n", L)
         print("U:\n",U)
     ok = checkALUP(A, L, U, P)

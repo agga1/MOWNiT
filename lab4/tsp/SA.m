@@ -4,12 +4,12 @@ close all
 %% Symulated Annealing for solving TSP
 
 %% parameters
-graph  = createGraph(20, 3); % choose graph
-T=100;                         % start temperature
-alph=0.9992;                   % cooling factor
-iter = 7000;                  % nr of iterations to perform
+graph  = createGraph(20, 1); % choose graph
+T=160;                         % start temperature
+alph=0.9994;                   % cooling factor
+iter = 12000;                  % nr of iterations to perform
 consecutive = false;         % type of swap (consecutive / arbitrary)
-drawSteps = 0;               % draw steps while execution: 0-don't, 1-some, 2-all
+drawSteps = 1;               % draw steps while execution: 0-don't, 1-some, 2-all
 %% initializing variables
 optimState.tour = randperm(graph.n);
 optimState.cost = fitnessF ( optimState.tour , graph);

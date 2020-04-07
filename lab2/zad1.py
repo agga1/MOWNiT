@@ -19,8 +19,9 @@ def gauss_jordan(m: np.array, eps = 1.0/(10**10)):
         for row in range(0, y):
             factor = m[row][y]/m[y][y]
             m[row, y:] -= m[y, y:]*factor
-    for row in range(0, h):
+    for row in range(0, h):  # dividing each row to get unitary matrix
         m[row][-1] /= m[row][row]
+        m[row][row] = 1
     result = m[:, -1]
     return result
 
