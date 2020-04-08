@@ -1,13 +1,14 @@
 # simple wiki dump converted to plain text provided by:
 # https://github.com/LGDoor/Dump-of-Simple-English-Wiki
 import os
-from Text import Article
+import concurrent.futures
+from classes.Article import Article
 from typing import List
 
 # chars forbidden in windows filenames (added () for clarity )
 windows_forbidden = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|", "(", ")"]
 
-def parse_to_separate_files(filename, max_count=10000):
+def parse_to_separate_files(filename, max_count=10000): #TODO add output folder
     """
     creates folder with each article in different file
     :param filename: name of txt file comprised of articles formatted like :
@@ -45,11 +46,11 @@ def parse_to_separate_files(filename, max_count=10000):
     return out_dir
 
 
-def files_to_articles(files_dir: str) -> List[Article]:
-    articles = []
-    for article_file in os.listdir(files_dir):
-        article_path = os.path.join(files_dir, article_file)
-        articles.append(file_to_article(article_path))
+def files_to_articles(files_dir: str, max_count=1000) -> List[Article]:
+    article_paths = [os.path.join(files_dir, file) for file in os.listdir(files_dir)]
+    article_paths = article_paths[:max_count]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        articles = list(executor.map(file_to_article, article_paths))
     return articles
 
 

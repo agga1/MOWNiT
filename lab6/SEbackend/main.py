@@ -1,23 +1,28 @@
-from Text import Text
-from SearchStruct import SearchStruct
-from text_parser import parse_to_separate_files, files_to_articles
+from classes.Text import Text
+from classes.SearchStruct import SearchStruct
+from preprocessing.text_parser import parse_to_separate_files, files_to_articles
+from time import perf_counter
 
 
-def to_SearchStruct(filename, max_count=20000) -> SearchStruct:
+def to_SearchStruct(art_dir, max_count=1000) -> SearchStruct:
     """
     Converts input data (1 txt file) to SearchStruct
-    :return: SearchStruct
+    :param max_count: only first max_count articles will be processed
     """
-    wikipath = parse_to_separate_files(filename, max_count)
-    articles = files_to_articles(wikipath)
-    return SearchStruct(articles)
+    start = perf_counter()
+    articles = files_to_articles(art_dir, max_count)
+    print(f"{max_count} articles processed")
+    end1 = perf_counter()
+    SS = SearchStruct(articles)
+    end2 = perf_counter()
+    print("created dictionary, creating Struct\n times: ", end1-start, end2-end1)
+    return SS
 
-def search_query(query, SearchStruct):
-    query = Text(query)
-    query.convert_to_BOW(SearchStruct.dictionary)
-    print(query)
 
-SS = to_SearchStruct("simple_wiki.txt", 3)
-print(SS.matrix)
-query = "august was a very interesting month"
-search_query(query, SS)
+# wikipath = parse_to_separate_files("preprocessing/data/simple_wiki.txt", 4000)
+SS = to_SearchStruct("articles", 1000)
+print("words in dict: ", len(SS.dictionary))
+#
+query = "august is my favorite month of the year"
+SS.search(query, 20)
+
