@@ -20,7 +20,6 @@ class Text:
         self.words = None  # free memory
         return self.BOW
 
-    # TODO def normalize_BOW
     def normalize_BOW(self):
         if np.count_nonzero(self.BOW) > 0:
             self.BOW /= LA.norm(self.BOW)

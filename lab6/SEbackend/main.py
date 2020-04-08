@@ -14,15 +14,18 @@ def to_SearchStruct(art_dir, max_count=1000) -> SearchStruct:
     print(f"{max_count} articles processed")
     end1 = perf_counter()
     SS = SearchStruct(articles)
+    # a =articles[0].text.convert_to_BOW(SS.dictionary)
+    # print(a)
     end2 = perf_counter()
     print("created dictionary, creating Struct\n times: ", end1-start, end2-end1)
     return SS
 
 
 # wikipath = parse_to_separate_files("preprocessing/data/simple_wiki.txt", 4000)
-SS = to_SearchStruct("articles", 1000)
+SS = to_SearchStruct("articles", 110)
 print("words in dict: ", len(SS.dictionary))
 #
-query = "august is my favorite month of the year"
-SS.search(query, 20)
+query = "april latin is my favorite sweet pea winter month of the year"
+SS.search(query, 5)
+SS.search(query, 5, 90)
 

@@ -1,11 +1,12 @@
-import concurrent.futures
 from time import perf_counter
-
+from scipy import sparse
+from scipy.sparse import csc_matrix, lil_matrix
+from scipy.sparse.linalg import svds, eigs
 import numpy as np
-from typing import List
-from classes.Article import Article
 from numpy import linalg as LA
 
+from typing import List
+from classes.Article import Article
 from classes.Text import Text
 
 
@@ -25,8 +26,9 @@ class SearchStruct:
         self.scale_by_IDF()
         self.normalize()
         st3 = perf_counter()
-        print(f"creating dict:{st1-st}\ntxt_tomx {st2-st1}\nscaling and norm: {st3-st2}")
-        # self.matrix_no_noise = self.remove_noise(self.matrix)
+        print(f"creating dict:  {st1-st}"
+              f"\ntxt_tomx {st2-st1}"
+              f"\nscaling and norm: {st3-st2}")
 
     def create_dictionary(self):
         """
@@ -61,27 +63,28 @@ class SearchStruct:
     def normalize(self):
         self.matrix /= LA.norm(self.matrix, axis=0)
 
-    def search(self, query_text: str, k:int):
+    def search(self, query_text: str, top_k: int, lra_k=None):
         query = Text(query_text)
         query.convert_to_BOW(self.dictionary)
         query.normalize_BOW()
-
-        products = np.zeros(self.matrix.shape[1])
-        for c in range(self.matrix.shape[1]):
-            products[c] = np.dot(self.matrix[:, c], query.BOW)
-        best_articles_at = np.argpartition(products, -k)[-k:]
+        mx = self.matrix if lra_k is None else self.remove_noise(lra_k)
+        products = np.zeros(mx.shape[1])
+        for c in range(mx.shape[1]):
+            products[c] = np.dot(mx[:, c], query.BOW)
+        best_articles_at = np.argpartition(products, -top_k)[-top_k:]
         results = [(self.articles[idx], products[idx]) for idx in best_articles_at]
         results = sorted(results, key=lambda res: res[1], reverse=True)
         print(f"searched phrase : {query_text}")
         for res in results:
             print(f"{res[0]}\n correlation: {res[1]}")
 
-    def remove_noise(self, matrix: np.array):
-        def low_rank_approx(U, S, V, k):
-            Uvcts = np.matrix(U[:, :k])  # first k-t singular vectors
-            Svals = np.diag(S[:k])  # k first singular values
-            Vvcts = np.matrix(V[:k, :])  # transposed k-th vct = k-th column
-            return Uvcts * Svals * Vvcts
-        U, S, V = LA.svd(matrix)
-        return low_rank_approx(U, S, V, 10) # TODO which k the best?
+    def remove_noise(self, k=10):
+        mx = lil_matrix(self.matrix)
+        print(mx.shape)
+        u, s, vt = svds(mx, k=k, which='LM')
+        s1 = np.diag(s)
+        lrapp = u@s1@vt
+        # print(lrapp[1])
+        return lrapp
+
 
