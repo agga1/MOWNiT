@@ -24,7 +24,8 @@ class SearchStruct:
         self.matrix = self.texts_to_matrix()
         st2 = perf_counter()
         self.scale_by_IDF()
-        self.normalize()
+        self.matrix = self.normalize(self.matrix)
+        self.noiseless_matrixes = {}
         st3 = perf_counter()
         print(f"creating dict:  {st1-st}"
               f"\ntxt_tomx {st2-st1}"
@@ -45,7 +46,7 @@ class SearchStruct:
             idx += 1
         return dictionary
 
-    def texts_to_matrix(self): # TODO BOW outside class?
+    def texts_to_matrix(self):  # TODO BOW outside class?
         # with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         #     BOWs = list(executor.map(lambda art: art.to_BOW_with_clean(self.dictionary), self.articles))
         BOWs = []
@@ -60,14 +61,20 @@ class SearchStruct:
         for i in range(len(self.dictionary)):
             self.matrix[i] *= IDF[i]  # TODO numpy way?
 
-    def normalize(self):
-        self.matrix /= LA.norm(self.matrix, axis=0)
+    def normalize(self, matrix):
+        return matrix / LA.norm(self.matrix, axis=0)
 
     def search(self, query_text: str, top_k: int, lra_k=None):
         query = Text(query_text)
         query.convert_to_BOW(self.dictionary)
         query.normalize_BOW()
-        mx = self.matrix if lra_k is None else self.remove_noise(lra_k)
+        mx = None
+        if lra_k is None:
+            mx = self.matrix
+        else:
+            if lra_k not in self.noiseless_matrixes.keys():
+                self.noiseless_matrixes[lra_k] = self.remove_noise(lra_k)
+            mx = self.noiseless_matrixes[lra_k]
         products = np.zeros(mx.shape[1])
         for c in range(mx.shape[1]):
             products[c] = np.dot(mx[:, c], query.BOW)
@@ -79,12 +86,14 @@ class SearchStruct:
             print(f"{res[0]}\n correlation: {res[1]}")
 
     def remove_noise(self, k=10):
+        """
+        calculates svd and low-rank app. of sparse matrix
+        :return: low rank approximation of self.matrix with first k single values
+        """
         mx = lil_matrix(self.matrix)
-        print(mx.shape)
         u, s, vt = svds(mx, k=k, which='LM')
         s1 = np.diag(s)
         lrapp = u@s1@vt
-        # print(lrapp[1])
         return lrapp
 
 
