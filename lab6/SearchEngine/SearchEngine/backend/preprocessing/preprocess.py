@@ -27,9 +27,3 @@ def init_search(art_count=1000) -> SearchStruct:
     SS = to_SearchStruct(art_dir, art_count)
     return SS
 
-# SS = init_search(400)
-# query = "april latin is my favorite sweet pea winter month of the year"
-# SS.search(query, 5)
-# SS.search(query, 5, 100)
-# SS.search(query, 5, 50)
-

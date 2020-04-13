@@ -18,6 +18,9 @@ def index(request):
         searchStruct = init_search(300)
     return render(request, 'search/index.html', {})
 
+def start(request):
+    return render(request, 'search/start.html', {})
+
 def detail(request, article_id):
     global searchStruct
     article_path = searchStruct.articles[article_id].link # TODO read file

@@ -5,6 +5,7 @@ from . import views
 app_name = 'search' # add namespace
 urlpatterns = [
     path('', views.index, name='index'),
+    path('start/', views.start, name='start'),
     path('results/<query>', views.results, name='results'),
     path('find/', views.find, name='find'),
     path('<int:article_id>/', views.detail, name='detail'),
