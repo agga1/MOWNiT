@@ -28,7 +28,7 @@ def to_SearchStruct(art_dir, art_count=1000) -> SearchStruct:
 def init_search(art_count=1000) -> SearchStruct:
     curr_dir = os.getcwd()
     art_dir = os.path.join(curr_dir, "articles")
-    if not os.path.exists(art_dir) or len(os.listdir(art_dir))< art_count:
+    if (Article.objects.count() < art_count) and (not os.path.exists(art_dir) or len(os.listdir(art_dir))< art_count):
         dump_dir = os.path.join(curr_dir, "data", "simple_wiki.txt")
         parse_to_separate_files(dump_dir, art_dir, art_count)
     SS = to_SearchStruct(art_dir, art_count)

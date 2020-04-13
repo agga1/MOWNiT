@@ -64,7 +64,7 @@ def file_to_article(article_path: str) -> Article:
     file = open(article_path, "r", encoding="utf8")
     title = file.readline()[:-1]  # no \n
     text = "\n".join(file.readlines())
-    article = Article(title, text, article_path)
+    article = Article(title, text)
     if len(dbArticle.objects.filter(title=title))==0:
         dbArt = dbArticle(title=title, content=text)
         dbArt.save()
