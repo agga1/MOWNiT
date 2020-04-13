@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}results{% endblock %}
+{% block content %}
+<h3>Results for query: {{ query}}</h3>
+    <ul>
+{#    <a href="{% url 'search:detail' answer.link %}"></a>#}
+    {% for article, correlation in answers %}
+        <li><a href="{% url 'search:detail' article.id %}">{{article.title}}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

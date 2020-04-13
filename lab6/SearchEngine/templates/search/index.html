@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Query{% endblock %}
+
+{% block content %}
+    <form action="{% url 'search:find'%}" method="get">
+          <label for="query">search for:</label><br>
+        <input type="text" name="query" id="query"><br>
+        <input type="radio" id="svd" name="svd_opt" value="yes">
+          <label for="svd">use SVD</label>
+        <input type="radio" id="no_svd" name="svd_opt" value="no">
+          <label for="no_svd">no SVD</label><br>
+          <label for="quantity">Get top n matching:</label>
+        <input type="number" id="quantity" name="quantity" min="1"><br>
+        <input type="submit" value="Search">
+    </form>
+{% endblock %}
