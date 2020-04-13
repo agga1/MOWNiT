@@ -18,8 +18,6 @@ class SearchStruct:
         - creates matrix word X article
         """
         self.articles = articles
-        for idx, article in enumerate(articles):
-            article.id = idx
         st = perf_counter()
         self.dictionary = self.create_dictionary()
         st1 = perf_counter()
@@ -48,7 +46,7 @@ class SearchStruct:
             idx += 1
         return dictionary
 
-    def texts_to_matrix(self):  # TODO BOW outside class?
+    def texts_to_matrix(self):
         # with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         #     BOWs = list(executor.map(lambda art: art.to_BOW_with_clean(self.dictionary), self.articles))
         BOWs = []

@@ -3,7 +3,10 @@
 {% block title %}Search Query{% endblock %}
 
 {% block content %}
-<a href="{% url 'search:start'%}">
-   <button>Start search</button>
+        <form action="{% url 'search:start'%}" method="get">
+          <label for="quantity">How many articles (recommended <2000):</label>
+        <input type="number" id="articles_nr" name="articles_nr" min="1" max="2000"><br>
+        <input type="submit" value="index files">
+    </form>
 </a>
 {% endblock %}

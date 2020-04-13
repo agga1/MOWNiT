@@ -3,6 +3,7 @@
 {% block title %}Search Query{% endblock %}
 
 {% block content %}
+    <h3>Files successfully indexed!</h3>
     <form action="{% url 'search:find'%}" method="get">
           <label for="query">search for:</label><br>
         <input type="text" name="query" id="query"><br>

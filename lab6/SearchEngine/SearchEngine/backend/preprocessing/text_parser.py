@@ -46,11 +46,12 @@ def parse_to_separate_files(filename, out_dir, max_count=10000): #TODO add outpu
     return out_dir
 
 
-def files_to_articles(files_dir: str, max_count=1000) -> List[Article]:
+def articles_from_files(files_dir: str, max_count=1000) -> List[Article]:
     article_paths = [os.path.join(files_dir, file) for file in os.listdir(files_dir)]
     article_paths = article_paths[:max_count]
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         articles = list(executor.map(file_to_article, article_paths))
+    # os.rmdir(files_dir) TODO rm articles?
     return articles
 
 
@@ -59,17 +60,33 @@ def file_to_article(article_path: str) -> Article:
     creates Article object based on txt file:
     represented as list of words (later to be converted as BOW, when dictionary will be built)
     """
-    file = open(article_path, "r", encoding="utf8")
-    title = file.readline()[:-1]  # no \n
-    text = "".join(file.readlines())
-    article = Article(title, text, article_path)
-    return article
-
-def article_to_display(article_path: str) -> dict:
+    from search.models import Article as dbArticle
     file = open(article_path, "r", encoding="utf8")
     title = file.readline()[:-1]  # no \n
     text = "\n".join(file.readlines())
-    return {"title": title, "text": text}
+    article = Article(title, text, article_path)
+    if len(dbArticle.objects.filter(title=title))==0:
+        dbArt = dbArticle(title=title, content=text)
+        dbArt.save()
+        article.id = dbArt.id
+    article.id = dbArticle.objects.get(title=title).id
+    print(f"id of article {article} is {article.id}")
+    return article
+
+def articles_from_dbArticles(art_count=1000) -> list:
+    from search.models import Article as dbArticle
+    articles = []
+    cnt = 0
+    for art in dbArticle.objects.all():
+        print(art.title)
+        articles.append(Article(title=art.title, text=art.content, id=art.id))
+        cnt+=1
+        if art_count <=cnt:
+            break
+    return articles
+
+
+
 
 
 
