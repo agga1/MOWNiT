@@ -10,15 +10,16 @@ from search.models import Article
 
 searchStruct = None
 answers = None
-# TODO save articles.txt to db
 
 def index(request):
-    global searchStruct
-    if searchStruct is None:
-        searchStruct = init_search(300)
+    global searchStruct, answers
+    searchStruct, answers = None, None
     return render(request, 'search/index.html', {})
 
 def start(request):
+    global searchStruct
+    if searchStruct is None:
+        searchStruct = init_search(1000)
     return render(request, 'search/start.html', {})
 
 def detail(request, article_id):
@@ -32,13 +33,13 @@ def results(request, query):
     return render(request, 'search/results.html', {'query': query, 'answers': answers})
 
 def find(request):
-    print("here")
-    query = request.GET['query']
-    use_SVD = 1 if request.GET['svd_opt']=="yes" else 0
-    lra_k = 90 if use_SVD else None
-    top_k = int(request.GET['quantity'])
     global searchStruct
     global answers
+    query = request.GET['query']
+    use_SVD = 1 if request.GET['svd_opt']=="yes" else 0
+    art_nr = len(searchStruct.articles)
+    lra_k = min(90, art_nr-1) if use_SVD else None
+    top_k = min(int(request.GET['quantity']), art_nr)
     answers = searchStruct.search(query, top_k=top_k, lra_k=lra_k)
     print("len:",len(answers))
     return redirect('search:results', query=query)
