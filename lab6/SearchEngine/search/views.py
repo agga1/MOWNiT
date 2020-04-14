@@ -19,7 +19,10 @@ def index(request):
 def start(request):
     global searchStruct, answers
     answers = None
-    if searchStruct is None:
+    if request.method == 'GET':
+        N = int(request.GET['articles_nr'])
+        searchStruct = init_search(N)
+    elif searchStruct is None:
         searchStruct = init_search(1000)
     return render(request, 'search/start.html', {})
 
