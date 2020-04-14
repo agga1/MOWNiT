@@ -74,11 +74,11 @@ def file_to_article(article_path: str) -> Article:
     return article
 
 def articles_from_dbArticles(art_count=1000) -> list:
+    print("from db")
     from search.models import Article as dbArticle
     articles = []
     cnt = 0
     for art in dbArticle.objects.all():
-        print(art.title)
         articles.append(Article(title=art.title, text=art.content, id=art.id))
         cnt+=1
         if art_count <=cnt:
