@@ -17,7 +17,8 @@ def index(request):
     return render(request, 'search/index.html', {})
 
 def start(request):
-    global searchStruct
+    global searchStruct, answers
+    answers = None
     if searchStruct is None:
         searchStruct = init_search(1000)
     return render(request, 'search/start.html', {})
@@ -41,5 +42,5 @@ def find(request):
     lra_k = min(90, art_nr-1) if use_SVD else None
     top_k = min(int(request.GET['quantity']), art_nr)
     answers = searchStruct.search(query, top_k=top_k, lra_k=lra_k)
-    print("len:",len(answers))
+    print("len:", len(answers))
     return redirect('search:results', query=query)
