@@ -1,12 +1,6 @@
-from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
-
-# Create your views here.
-from django.urls import reverse_lazy, reverse
-
 from SearchEngine.backend.preprocessing.preprocess import init_search
 from SearchEngine.backend.preprocessing.text_parser import article_to_display
-from search.models import Article
 
 searchStruct = None
 answers = None
@@ -28,7 +22,7 @@ def start(request):
 
 def detail(request, article_id):
     global searchStruct
-    article_path = searchStruct.articles[article_id].link # TODO read file
+    article_path = searchStruct.articles[article_id].link
     article = article_to_display(article_path)
     return render(request, 'search/detail.html', {'article': article})
 

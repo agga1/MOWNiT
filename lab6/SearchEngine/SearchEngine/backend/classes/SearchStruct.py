@@ -1,7 +1,6 @@
 from time import perf_counter
-from scipy import sparse
-from scipy.sparse import csc_matrix, lil_matrix
-from scipy.sparse.linalg import svds, eigs
+from scipy.sparse import lil_matrix
+from scipy.sparse.linalg import svds
 import numpy as np
 from numpy import linalg as LA
 
@@ -27,7 +26,7 @@ class SearchStruct:
         st2 = perf_counter()
         self.scale_by_IDF()
         self.matrix = self.normalize(self.matrix)
-        self.noiseless_matrixes = {}
+        self.noiseless_matrixes = {} # cached svd matrixes
         st3 = perf_counter()
         print(f"creating dict:  {st1-st}"
               f"\ntxt_tomx {st2-st1}"
@@ -49,8 +48,6 @@ class SearchStruct:
         return dictionary
 
     def texts_to_matrix(self):  # TODO BOW outside class?
-        # with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-        #     BOWs = list(executor.map(lambda art: art.to_BOW_with_clean(self.dictionary), self.articles))
         BOWs = []
         for article in self.articles:
             BOWs.append(article.text.convert_to_BOW(self.dictionary))
@@ -70,12 +67,14 @@ class SearchStruct:
         query = Text(query_text)
         query.convert_to_BOW(self.dictionary)
         query.normalize_BOW()
-        mx = None
         if lra_k is None:
             mx = self.matrix
         else:
             if lra_k not in self.noiseless_matrixes.keys():
+                if len(self.noiseless_matrixes) > 5:
+                    self.noiseless_matrixes = {}
                 self.noiseless_matrixes[lra_k] = self.remove_noise(lra_k)
+
             mx = self.noiseless_matrixes[lra_k]
         products = np.zeros(mx.shape[1])
         for c in range(mx.shape[1]):

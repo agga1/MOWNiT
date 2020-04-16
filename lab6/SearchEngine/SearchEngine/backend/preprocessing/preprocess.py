@@ -27,3 +27,5 @@ def init_search(art_count=1000) -> SearchStruct:
     SS = to_SearchStruct(art_dir, art_count)
     return SS
 
+
+
