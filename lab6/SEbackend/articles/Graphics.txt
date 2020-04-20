@@ -1,0 +1,2 @@
+Graphics
+Graphics are visual presentations on some kind of surface. Examples are photographs, drawings, maps and other images.

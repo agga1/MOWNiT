@@ -1,0 +1,8 @@
+List of operating systems
+This is a list of operating systems.
+Hobby OS.
+Operating systems written for a hobby.
+Microcontroller, embedded.
+Little operating systems that run on small devices.
+Fictional operating systems.
+Operating systems that have only appeared in fiction or as jokes.
