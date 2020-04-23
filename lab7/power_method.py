@@ -1,7 +1,7 @@
 from typing import Callable, Tuple
 
 import numpy as np
-from scipy.linalg import eigh, lu_factor, lu_solve
+from scipy.linalg import eigh, lu_factor, lu_solve, inv
 import matplotlib.pyplot as plt
 from time_eval import time_eval
 
@@ -60,12 +60,30 @@ def inv_power_method(A: np.array, mu, max_iter: int = 100000, eps: float = 1e-8,
         return mu, v, i
     return mu, v
 
-def improve_inv_method(A: np.array, *args):
-    mu, v, iter = power_method(A, max_iter=10, eps=1, return_iter=True)
-    print("foun mu ", mu," in ",  iter)
-    return inv_power_method(A, mu, *args)
+def rayleigh_iteration(A: np.array, mu, max_iter: int = 100000, eps: float = 1e-8, return_iter=False):
+    """ finding eigen vector using inverse power method, and eigenvalue using Rayleigh quotient
+        :param A: matrix
+        :param mu: approximation for the eigenvalue corresponding to the desired eigenvector
+        :param max_iter: stop algorithm after @max_iter iterations
+        :param eps: stop algorithm after reaching desired accuracy
+        :param return_iter: returns nr of iterations as third element
+        :return: λ, v [,iter]
+        """
+    v = np.random.rand(A.shape[0])
+    i = 0
+    while i < max_iter:
+        i += 1
+        AuI = A - mu * np.identity(A.shape[0])
+        w = inv(AuI)@v
+        w = w / np.linalg.norm(w)
+        mu = (w.T @ A @ w )/(w.T@w)
+        if np.linalg.norm(v - w) < eps or np.linalg.norm(v + w) < eps:
+            break
+        v = w
 
-
+    if return_iter:
+        return mu, v, i
+    return mu, v
 
 def check_with_library(n, func: Callable[[np.array, any], Tuple[float, np.array]], eps=1e-5):
     A = np.random.rand(n, n)
@@ -106,21 +124,22 @@ check_with_library(300, power_method, 1e-5)
 # plotting correlation between time needed for power_method execution and input matrix size
 plot_power_method()
 
-# comparing
-A = np.random.rand(100, 100)
+# comparing results
+A = np.random.rand(10, 10)
 A = A * np.transpose(A)
 
-eigvec, eigval , iter = inv_power_method(A, 0, 1000, 1e-8, return_iter=True)
-eigvec2, eigval2, iter2 = inv_power_method(A, 10, 1000, 1e-8, return_iter=True)
-eigvec3, eigval3, iter3 = inv_power_method(A, 55, 1000, 1e-8, return_iter=True)
-eigvec4, eigval4, iter4 = power_method(A, 1000, 1e-5, return_iter=True)
+def print_summary(name, func, *args, **kwargs):
+    print(f"{name}:")
+    eigvec, eigval , iter = func(*args, **kwargs)
+    print("value: ", round(eigvec, 8), "iterations:", iter, "\n")
+
+
+print_summary("power method", power_method, A, 1000, 1e-8, return_iter=True)
+print_summary("inverse method, random sigma", inv_power_method, A, 10, 1000, 1e-8, return_iter=True)
+print_summary("inverse method, other random sigma", inv_power_method, A, 100, 1000, 1e-8, return_iter=True)
 mu, _ = power_method(A, max_iter=10, eps=0.3)  # assuming we know a good approximation of eigenvalue
-eigvec5, eigval5, iter5 = inv_power_method(A, mu, 1000, 1e-8, True)
+print_summary("inverse method, having good approximation", inv_power_method, A, mu, 1000, 1e-8, return_iter=True)
+print_summary("rayleigh method", rayleigh_iteration, A, mu, 1000, 1e-8, return_iter=True)
 
-print(eigvec, eigval[0], iter)
-print(eigvec2, eigval2[0], iter2)
-print(eigvec3, eigval3[0], iter3)
-print(eigvec4, eigval4[0], iter4)
-print(eigvec5, eigval5[0], iter5)
-
+print("rayleigh method converges the quickest")
 
