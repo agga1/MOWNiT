@@ -1,6 +1,6 @@
 from loadGraph import asNxGraph
 from time_eval import time_eval
-from zad1 import vertexRank, vertexRank2, vertexRank3
+from zad1 import vertexRank, vertexRankFast
 from zad2 import pageRankE
 import numpy as np
 
@@ -9,16 +9,14 @@ import numpy as np
 gr = asNxGraph("graphs/some")
 eps = 1e-10
 
-time_eval(vertexRank, "standard power method", 10, gr, eps)
-time_eval(vertexRank2, "using stationary state def", 10, gr, eps)
-time_eval(vertexRank3, "using ergodic markov chain property", 10, gr, eps)
-
-gr = asNxGraph("graphs/some")
-eps = 1e-4
+time_eval(vertexRank, "vertex rank", 10, gr, eps)
+time_eval(vertexRankFast, "vertex rank using ergodic markov chain property", 10, gr, eps)
 
 """ task 2 summary """
 
+gr = asNxGraph("graphs/some")
 print("\ne = same value for each:")
+eps = 1e-4
 d = 0.85
 e = 1/len(gr)*np.ones(len(gr))
 r = pageRankE(gr, e, d)
