@@ -40,8 +40,7 @@ def vertexRank(g: nx.DiGraph, eps=1e-10, A=None):
         mu = mu2
         mu2 = mu @ A
 
-    r = mu / norm(mu)  # normalizing result
-    return r
+    return mu
 
 
 def vertexRankFast(g: nx.DiGraph, eps=1e-10, A=None):
@@ -65,5 +64,4 @@ def vertexRankFast(g: nx.DiGraph, eps=1e-10, A=None):
     while norm(mu - mu @ A) > eps:
         mu = mu @ mx_pow(A, 100)
 
-    r = mu / norm(mu)  # normalizing result
-    return r
+    return mu
