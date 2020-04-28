@@ -3,21 +3,20 @@ import networkx as nx
 import numpy as np
 from numpy.linalg import matrix_power as mx_pow, norm
 
-from time_eval import time_eval
 from zad1 import getNormAdjMatrix
 
-
-def pageRank(g: nx.DiGraph, d=0.85, eps=1e-8):
+def pageRankE(g: nx.DiGraph, e, d=0.85, eps=1e-8):
     """
     :return: page rank of given graph, implementation analogous to vertexRank2 method
     """
     A = getNormAdjMatrix(g)
-    n = len(g)
-    # add probability of random jump (and rescale A by d to maintain transition table property)
-    A = d*A
-    A += (1-d)/n
 
+    # add probability of random jump (and rescale A by d to maintain transition table property)
     n = len(g)
+    A = d*A
+    R = np.tile((1-d)*e, (n, 1))
+    A += R
+
     mu = np.random.rand(n)  # random state
     mu /= sum(mu)
 
@@ -32,8 +31,24 @@ def pageRank(g: nx.DiGraph, d=0.85, eps=1e-8):
     return r
 
 gr = asNxGraph("graphs/some")
-eps=1e-4
-r1 = pageRank(gr)
-print("page rank:", r1)
-time_eval(pageRank, "page rank", 4, gr, eps)
+eps = 1e-4
+
+print("\nsame value for each:")
+d = 0.85
+e = 1/len(gr)*np.ones(len(gr))
+r = pageRankE(gr, e, d)
+print(f"d={d}\n r={r}")
+d = 0.5
+r = pageRankE(gr, e, d)
+print(f"d={d}\n r={r}")
+
+print("\n[1 2 .. n] normalized by sum")
+d = 0.85
+e = np.array([i for i in range(1, len(gr)+1)])
+e = e/sum(e)
+r = pageRankE(gr, e)
+print(f"d={d}\n r={r}")
+d = 0.5
+r = pageRankE(gr, e, d=0.5)
+print(f"d={d}\n r={r}")
 

@@ -90,8 +90,8 @@ def vertexRank3(g: nx.DiGraph, eps=1e-10):
 gr = asNxGraph("graphs/some")
 eps = 1e-5
 
-time_eval(vertexRank, "standard power method", 4, gr, eps)
-time_eval(vertexRank, "using stationary state def", 4, gr, eps)
-time_eval(vertexRank, "using ergodic markov chain property", 4, gr, eps)
+# time_eval(vertexRank, "standard power method", 4, gr, eps)
+# time_eval(vertexRank, "using stationary state def", 4, gr, eps)
+# time_eval(vertexRank, "using ergodic markov chain property", 4, gr, eps)
 
 
