@@ -1,9 +1,8 @@
-from loadGraph import asNxGraph
 import networkx as nx
 import numpy as np
 from numpy.linalg import matrix_power as mx_pow, norm
-from time_eval import time_eval
 
+""" Vertex rank analysis """
 
 def getNormAdjMatrix(graph: nx.DiGraph)-> np.array:
     """
@@ -41,7 +40,7 @@ def vertexRank(g: nx.DiGraph, eps=1e-10):
     return r
 
 def vertexRank2(g: nx.DiGraph, eps=1e-10):
-    """ Stochastic interpretation of vertex rank
+    """ Stochastic interpretation of vertex rank - faster computation
     finding vertex rank using stationary state property of ergodic markov chains:
     1) mu is a stationary state <=> mu = mu*A
     2) stationary state mu = lim u*(A^n) (n->inf), where u- any state, A is a transition table
@@ -63,14 +62,9 @@ def vertexRank2(g: nx.DiGraph, eps=1e-10):
     r = mu/norm(mu)  # normalizing result
     return r
 
+
 def vertexRank3(g: nx.DiGraph, eps=1e-10):
-    """ Stochastic interpretation of vertex rank
-    finding vertex rank using stationary state property of ergodic markov chains:
-    1) mu is a stationary state <=> mu = mu*A
-    2) stationary state mu = lim u*(A^n) (n->inf), where u- any state, A is a transition table
-    :param g: graph with vertices labeled from 0, .. n-1
-    :return: vertex rank
-    """
+    """ Stochastic interpretation of vertex rank - sped up using 2) property from previous method """
     A = getNormAdjMatrix(g)
 
     n = len(g)
@@ -81,17 +75,11 @@ def vertexRank3(g: nx.DiGraph, eps=1e-10):
     mu = np.random.rand(n)  # random state
     mu /= sum(mu)
     while norm(mu - mu@A) > eps:
-        mu = mu @ mx_pow(A, 500)
+        mu = mu @ mx_pow(A, 100)
 
     r = mu/norm(mu)  # normalizing result
-
     return r
 
-gr = asNxGraph("graphs/some")
-eps = 1e-5
 
-# time_eval(vertexRank, "standard power method", 4, gr, eps)
-# time_eval(vertexRank, "using stationary state def", 4, gr, eps)
-# time_eval(vertexRank, "using ergodic markov chain property", 4, gr, eps)
 
 

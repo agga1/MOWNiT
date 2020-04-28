@@ -16,5 +16,5 @@ def time_eval(func: Callable, name, times,  *args, **kwargs):
     end_pc = perf_counter()
     avg_pc = (end_pc-start_pc)/times
     if name is not None:
-        print(name, "time:", avg_pc)
+        print(name, "time:", round(avg_pc, 6))
     return avg_pc, res
