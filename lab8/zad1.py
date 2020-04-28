@@ -2,33 +2,34 @@ from loadGraph import asNxGraph
 import networkx as nx
 import numpy as np
 from numpy.linalg import matrix_power as mx_pow, norm
-from time import perf_counter
+from time_eval import time_eval
 
 
-def getAdjMatrix(graph: nx.DiGraph)-> np.array:
+def getNormAdjMatrix(graph: nx.DiGraph)-> np.array:
     """
     :param graph: labeled from 0
-    :return: np.array n x n
+    :return:
+     adjacency matrix n x n of @graph, where sum of each row = 1
+     which makes A a transition matrix of markov chain
+     (each row (state) describes probability of transition to other states (rows))
     """
     n = len(graph)
     A = np.zeros((n, n))
     for v in graph:
+        nv = len(graph[v])
         for u in graph[v].keys():
-            # print("edge", v, u)
-            A[v, u] = 1./n
+            A[v, u] = 1./nv
     return A
+
 
 def vertexRank(g: nx.DiGraph, eps=1e-10):
     """ simple vertex rank implementation
     :param g: graph with vertices labeled from 0, .. n-1
     :return: vertex rank
     """
-    A = getAdjMatrix(g)
-    d = np.sum(A, axis=1).reshape(-1, 1)
-    A /= d
+    A = getNormAdjMatrix(g)
 
     # power method implementation
-    st1 = perf_counter()
     n = len(g)
     r = np.random.rand(n)
     r /= norm(r)
@@ -36,8 +37,7 @@ def vertexRank(g: nx.DiGraph, eps=1e-10):
     while(norm(r2-r) > eps):
         r = r2/norm(r2)
         r2 = r@A
-    st2 = perf_counter()
-    print(st2-st1)
+
     return r
 
 def vertexRank2(g: nx.DiGraph, eps=1e-10):
@@ -48,25 +48,18 @@ def vertexRank2(g: nx.DiGraph, eps=1e-10):
     :param g: graph with vertices labeled from 0, .. n-1
     :return: vertex rank
     """
-    A = getAdjMatrix(g)
-    d = np.sum(A, axis=1).reshape(-1, 1)
-    # I normalize each row so that sum(row) = 1,
-    #  which makes A a transition matrix of markov chain
-    # (each row (state) describes probability of transition to other states (rows))
-    A /= d
+    A = getNormAdjMatrix(g)
+
     n = len(g)
-    mu = np.random.rand(n)  # random state
-    mu /= sum(mu)
+    mu = np.random.rand(n)
+    mu /= sum(mu)   # random state
 
     # finding stationary state (power method but normalization not necessary)
-    st1 = perf_counter()
     mu2 = mu@A
     while norm(mu-mu2) > eps:
         mu = mu2
         mu2 = mu@A
 
-    st2 = perf_counter()
-    print(st2-st1)
     r = mu/norm(mu)  # normalizing result
     return r
 
@@ -78,32 +71,27 @@ def vertexRank3(g: nx.DiGraph, eps=1e-10):
     :param g: graph with vertices labeled from 0, .. n-1
     :return: vertex rank
     """
-    A = getAdjMatrix(g)
-    d = np.sum(A, axis=1).reshape(-1, 1)
-    # I normalize each row so that sum(row) = 1,
-    #  which makes A a transition matrix of markov chain
-    # (each row (state) describes probability of transition to other states (rows))
-    A /= d
+    A = getNormAdjMatrix(g)
+
     n = len(g)
     mu = np.random.rand(n)  # random state
     mu /= sum(mu)
 
     # finding stationary state (power method but normalization not necessary)
-    st1 = perf_counter()
     mu = np.random.rand(n)  # random state
     mu /= sum(mu)
     while norm(mu - mu@A) > eps:
         mu = mu @ mx_pow(A, 500)
 
-    st2 = perf_counter()
-    print(st2-st1)
     r = mu/norm(mu)  # normalizing result
+
     return r
 
 gr = asNxGraph("graphs/some")
-eps = 1e-10
-r1 = vertexRank(gr, eps)
-r2 = vertexRank2(gr, eps)
-r3 = vertexRank3(gr, eps)
+eps = 1e-5
+
+time_eval(vertexRank, "standard power method", 4, gr, eps)
+time_eval(vertexRank, "using stationary state def", 4, gr, eps)
+time_eval(vertexRank, "using ergodic markov chain property", 4, gr, eps)
 
 
