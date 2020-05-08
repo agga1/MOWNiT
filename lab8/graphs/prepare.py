@@ -1,6 +1,7 @@
 from random import randint
 import snap
 
+""" making sure each row is a non-zero vector"""
 G = snap.LoadEdgeList(snap.PNGraph, "stanford4000.txt", 0, 1)
 n = 4000
 for i in range(n):
