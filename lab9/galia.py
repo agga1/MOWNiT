@@ -5,7 +5,7 @@ from PIL import Image
 from PIL import ImageOps
 
 # load, invert and to greyscale
-galia_img = ImageOps.invert(Image.open("galia.png").convert("L"))
+galia_img = ImageOps.invert(Image.open("res/galia.png").convert("L"))
 # 2-dim fourier transform
 galia = fft.fft2(np.asarray(galia_img))
 
@@ -20,7 +20,7 @@ plt.imshow(phase_matrix, cmap="gray")
 plt.show()
 
 
-letter = np.asarray(ImageOps.invert(Image.open("e.png").convert("L")))
+letter = np.asarray(ImageOps.invert(Image.open("res/e.png").convert("L")))
 letter_x = letter.shape[0]
 letter_y = letter.shape[1]
 w, h = galia.shape
@@ -38,7 +38,7 @@ plt.imshow(mx, cmap="gray")
 plt.show()
 # ----
 max_correlation = np.amax(absolute_correlations)
-new_img = np.array(Image.open("galia.png").convert("RGB"))
+new_img = np.array(Image.open("res/galia.png").convert("RGB"))
 
 e_count = 0
 for i in range(absolute_correlations.shape[0]):
@@ -53,5 +53,5 @@ for i in range(absolute_correlations.shape[0]):
                 new_img[i-letter_x, j-l] = (255, 0, 0)
 
 result = Image.fromarray(new_img)
-result.save("new_galia.jpg")
+result.save("out/new_galia.jpg")
 print(e_count)
