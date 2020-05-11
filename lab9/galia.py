@@ -5,9 +5,9 @@ from PIL import Image
 from PIL import ImageOps
 
 # load, invert and to greyscale
-galia_img = ImageOps.invert(Image.open("res/galia.png").convert("L"))
+galia_img = np.asarray(ImageOps.invert(Image.open("res/galia.png").convert("L")))
 # 2-dim fourier transform
-galia = fft.fft2(np.asarray(galia_img))
+galia = fft.fft2(galia_img)
 
 # plot absolutes
 absolute_matrix = np.log10(np.abs(galia))  # log scale, since without it the image will be entirely black
@@ -27,15 +27,15 @@ w, h = galia.shape
 letter = fft.fft2(rot90(letter, 2), s=(w, h))
 
 #---
-mx = np.angle(letter)
-plt.imshow(mx, cmap="gray")
-plt.show()
-# ----
+# mx = np.angle(letter)
+# plt.imshow(mx, cmap="gray")
+# plt.show()
+# # ----
 absolute_correlations = abs(fft.ifft2(multiply(galia, letter)))
-# ---
-mx = absolute_correlations
-plt.imshow(mx, cmap="gray")
-plt.show()
+# # ---
+# mx = absolute_correlations
+# plt.imshow(mx, cmap="gray")
+# plt.show()
 # ----
 max_correlation = np.amax(absolute_correlations)
 new_img = np.array(Image.open("res/galia.png").convert("RGB"))
@@ -53,5 +53,6 @@ for i in range(absolute_correlations.shape[0]):
                 new_img[i-letter_x, j-l] = (255, 0, 0)
 
 result = Image.fromarray(new_img)
-result.save("out/new_galia.jpg")
+
+result.save("out/galia_result.jpg")
 print(e_count)

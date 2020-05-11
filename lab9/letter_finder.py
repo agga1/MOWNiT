@@ -60,7 +60,7 @@ def find_all_letters(text_name, alphabet_name):
 
 # consolas150 # 2 5 7 2
 # cn150 2 1 3 2
-text_name = "res/consolas150noise.png"
+text_name = "res/consolas150.png"
 
 alphabet_name = "res/consolas_alph.png"
 find_all_letters(text_name, alphabet_name)
