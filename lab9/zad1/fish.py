@@ -32,7 +32,7 @@ for i in range(classification.shape[0]):
             mark_classified[x, y][2] /= 3  # better visibility
 
 plt.imshow(mark_classified)
-plt.title(f"{threshold}")
+plt.title(f"classificaiton for threshold {threshold}")
 plt.show()
 
 # count fish using disjoint set union
