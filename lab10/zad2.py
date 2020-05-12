@@ -2,9 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from zad1 import FFT
 
+""" comparing static and non-static signals -
+    after fourier transform of signals comprised of the same 
+    input functions but distributed differently,
+    peaks are observed at the same frequencies, regardless of signal type
+    (static or non static). Fourier transform is therefore better suited
+    for the analysis of static signals. """
+
 n = 512
 xs = np.arange(n)
-freq = np.fft.fftfreq(n)
+freq = np.fft.fftfreq(n)  # sample frequencies
 
 # 3 periodic functions with different frequencies
 ys1 = np.sin(xs)
