@@ -1,13 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from Sets import find_disjoint
-from fourier import find_pattern, plot_fourier
+from zad1.Sets import find_disjoint
+from zad1.fourier import find_pattern, plot_fourier
 
-school = np.asarray(Image.open("res/school.jpg").convert("RGB"))
+image_name = "../res/school.jpg"
+pattern_name = "../res/fish1.png"
+result_name = "../out/fish_result.jpg"
+
+school = np.asarray(Image.open(image_name).convert("RGB"))
 school_red = school[:, :, 0]  # extracting only red channel (most significant)
 
-fish = np.asarray(Image.open("res/fish1.png").convert("RGB"))
+fish = np.asarray(Image.open(pattern_name).convert("RGB"))
 fish_red = fish[:, :, 0]
 
 plot_fourier(school_red)
@@ -16,7 +20,7 @@ threshold = 0.2
 classification = find_pattern(school_red, fish_red, threshold)
 
 # mark found fish
-mark_classified = np.array(Image.open("res/school.jpg").convert("RGB"))
+mark_classified = np.array(Image.open(image_name).convert("RGB"))
 h, w = fish_red.shape
 for i in range(classification.shape[0]):
     for j in range(classification.shape[1]):
@@ -35,7 +39,7 @@ plt.show()
 leaders = find_disjoint(classification)
 
 # mark leaders on image
-mark_leaders = np.array(Image.open("res/school.jpg").convert("RGB"))
+mark_leaders = np.array(Image.open(image_name).convert("RGB"))
 for i, j in leaders:
     mark_leaders[i - 3:i + 3, j - 3:j + 3] = [255, 0, 0]
 
@@ -46,4 +50,4 @@ plt.show()
 
 # save result
 result = Image.fromarray(mark_classified)
-result.save("out/fish_result.jpg")
+result.save(result_name)
