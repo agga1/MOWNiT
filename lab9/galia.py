@@ -1,58 +1,36 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import fft, rot90, multiply
 from PIL import Image
 from PIL import ImageOps
+from fourier import plot_fourier, find_pattern
 
 # load, invert and to greyscale
-galia_img = np.asarray(ImageOps.invert(Image.open("res/galia.png").convert("L")))
-# 2-dim fourier transform
-galia = fft.fft2(galia_img)
+galia = np.asarray(ImageOps.invert(Image.open("res/galia.png").convert("L")))
+e = np.asarray(ImageOps.invert(Image.open("res/e.png").convert("L")))
 
-# plot absolutes
-absolute_matrix = np.log10(np.abs(galia))  # log scale, since without it the image will be entirely black
-plt.imshow(absolute_matrix, cmap="gray")
-plt.show()
+plot_fourier(galia)
 
-# plot phases
-phase_matrix = np.angle(galia)
-plt.imshow(phase_matrix, cmap="gray")
-plt.show()
+threshold = 0.9
+classification = find_pattern(galia, e, threshold)
 
-
-letter = np.asarray(ImageOps.invert(Image.open("res/e.png").convert("L")))
-letter_x = letter.shape[0]
-letter_y = letter.shape[1]
-w, h = galia.shape
-letter = fft.fft2(rot90(letter, 2), s=(w, h))
-
-#---
-# mx = np.angle(letter)
-# plt.imshow(mx, cmap="gray")
-# plt.show()
-# # ----
-absolute_correlations = abs(fft.ifft2(multiply(galia, letter)))
-# # ---
-# mx = absolute_correlations
-# plt.imshow(mx, cmap="gray")
-# plt.show()
-# ----
-max_correlation = np.amax(absolute_correlations)
-new_img = np.array(Image.open("res/galia.png").convert("RGB"))
-
+# mark found letters
+mark_e = np.array(Image.open("res/galia.png").convert("RGB"))
+h, w = e.shape
 e_count = 0
-for i in range(absolute_correlations.shape[0]):
-    for j in range(absolute_correlations.shape[1]):
-        if absolute_correlations[i, j] >= 0.9 * max_correlation:
+for i in range(classification.shape[0]):
+    for j in range(classification.shape[1]):
+        if classification[i, j]:
             e_count += 1
-            for k in range(letter_x):
-                new_img[i-k, j] = (255, 0, 0)
-                new_img[i-k, j-letter_y] = (255, 0, 0)
-            for l in range(letter_y):
-                new_img[i, j-l] = (255, 0, 0)
-                new_img[i-letter_x, j-l] = (255, 0, 0)
+            mark_e[i-h:i, j] = (255, 0, 0)
+            mark_e[i-h:i, j-w] = (255, 0, 0)
+            mark_e[i, j-w:j] = (255, 0, 0)
+            mark_e[i-h, j-w:j] = (255, 0, 0)
 
-result = Image.fromarray(new_img)
+plt.imshow(mark_e)
+plt.title(f"threshold {threshold}, found {e_count} 'e'")
+plt.show()
+print(f"found {e_count} 'e'")
 
+# save result
+result = Image.fromarray(mark_e)
 result.save("out/galia_result.jpg")
-print(e_count)
