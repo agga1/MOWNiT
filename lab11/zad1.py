@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import diag
-from numpy.linalg import norm, qr, svd, inv
-import time
+from numpy.linalg import norm, qr, inv
+from time import perf_counter
 
-
-def graham_schmidt(A):
+def QR(A):
     Q = np.copy(A)
     R = np.zeros(A.shape, dtype=float)
 
@@ -34,43 +32,55 @@ def test_1(ns):
     for n in ns:
         print(f"test for n={n}")
         A = rnd(n)
-        Q, R = graham_schmidt(A)
+        st1 = perf_counter()
+        Q, R = QR(A)
+        st2 = perf_counter()
         q, r = np.linalg.qr(A)
+        st3 = perf_counter()
         assert (np.allclose(A, np.dot(Q, R))), "A != QR"
         assert (np.allclose(abs(q), abs(Q))), "q != Q"
         assert (np.allclose(abs(r), abs(R))), "r != R"
-        print("✓")
+        print(f"✓  my: {st2-st1}, numpy: {st3-st2}")
 
-test_1([3, 50, 200])
+# test_1([3, 50, 100, 200, 500])
 
 # generating 8x8 matrixes with different cond
-I = np.identity(8)
-cond_to_val = dict()
-while len(cond_to_val) < 50:
+def generate_Ms(count):
+    i = 0
+    Ms = []
+    conds = []
     A = np.random.rand(8, 8)
-    U, S, Vt = svd(A)
-    cond = S[0] / S[7]
-    if cond not in cond_to_val:
-        Q, R = graham_schmidt(A)
+    B = np.random.rand(8, 8)
+    U, _ = qr(A)
+    V, _ = qr(B)
+    while i < count:
+        S = np.zeros(A.shape[0])
+        S[0] = 1.
+        for j in range(1, A.shape[0]):
+            S[j] = S[j-1]+(i*j)
+        S = sorted(S, reverse=True)
+        cond = S[0]/S[7]
+        M = np.dot(U*S, V)
+        Ms.append(M)
+        conds.append(cond)
+        i += 1
+    return Ms, conds
+
+def get_val(Ms):
+    I = np.identity(Ms[0].shape[0])
+    vals = []
+    for A in Ms:
+        Q, R = QR(A)
         val = norm(I - Q.transpose() @ Q)
-        cond_to_val[cond] = val
+        vals.append(val)
+    return vals
 
-to_print = list(cond_to_val.items())
-to_print.sort()
-xs = [pair[0] for pair in to_print]
-ys = [pair[1] for pair in to_print]
-plt.plot(xs, ys, 'o')
-# plt.show()
+Ms, conds = generate_Ms(100)
+vals = get_val(Ms)
+plt.plot(conds, vals, 'o')
+plt.show()
 
-# ||I-Q^T*Q|| (cond(A))
-
-# prepare A matrix
-A = np.zeros((5, 3))
-A[:, 0] = 1
-A[0, 1] = 1
-A[1, 2] = 1
-
-B = np.matrix([3, 4, 1, 1, 1]).reshape(-1,1)
+# --- zad 2 --------
 
 def solve_overdet(A, B):
     m, n = A.shape
@@ -80,6 +90,26 @@ def solve_overdet(A, B):
     X = inv(R1)@(Q1.T@B)
     print(X)
     return X
+# solve equation
+# f(x) = a0 + a1*x + a2*x^2
+def solve_polyn_2(xs, ys):
+    A = np.zeros((xs.shape[0], 3))
+    A[:, 0] = 1
+    A[:, 1] = xs
+    A[:, 2] = xs*xs
+    return solve_overdet(A, ys.reshape(-1, 1))
 
-result = solve_overdet(A, B)
+def f(a, x):
+    return a[0, 0] + a[1, 0]*x + a[2, 0]*(x**2)
+
+xs = np.array([x for x in range(-5, 6)])
+ys = np.array([2,7,9,12,13,14,14,13,10,8,4])
+X = solve_polyn_2(xs, ys)
+plt.plot(xs, ys, 'o')
+# approximate function
+xs_approx = [x for x in np.arange(-6., 7., 0.2)]
+ys_approx = [f(X, x) for x in xs_approx]
+plt.plot(xs_approx, ys_approx)
+plt.show()
+
 
