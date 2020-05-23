@@ -1,19 +1,21 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from PIL import ImageOps
 from math import trunc
-text_name = "res/cn150.png"
-alphabet_name = "res/cn_sep_b.png"
+
 order = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
          'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'w', 'x', 'y', 'z',
-         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '.', '?', '!', ':', ';', '-']
+         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+         ',', '.', '?', '!', ':', ';', '-']
 
 def parse_alphabet(filename, up=2, down=1, left=3,right=2):
     alphabet = np.asarray(ImageOps.invert(Image.open(filename).convert("L")))
     alphabet = alphabet[up:-down, left:-right]
-    print(alphabet.shape)
+    # print(alphabet.shape)
     return alphabet
+
+def parse_text(text_name):
+    return np.asarray(ImageOps.invert(Image.open(text_name).convert("L")))
 
 def parse_letters(alphabet):
     """
@@ -32,12 +34,9 @@ def parse_letters(alphabet):
         letters.append(a)
         # plt.imshow(a, cmap="gray")
         # plt.show()
-    print(letters[0].shape)
+    # print(letters[0].shape)
     return letters
 
-
-def parse_text(text_name):
-    return np.asarray(ImageOps.invert(Image.open(text_name).convert("L")))
 
 
 
