@@ -2,9 +2,10 @@ import numpy as np
 from PIL import Image
 from PIL import ImageOps
 from math import trunc
+import matplotlib.pyplot as plt
 
 order = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'w', 'x', 'y', 'z',
+         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'w', 'v', 'x', 'y', 'z',
          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
          ',', '.', '?', '!', ':', ';', '-']
 

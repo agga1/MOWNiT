@@ -76,10 +76,30 @@ class Stats:
         for line in self.lines:
             print(line)
 
-    def show_diff(self, answer):
+    def compare(self, answer, show_diff = False):
         text = '\n'.join(self.lines)
-        undedected = self.diff(list(answer), list(text))
-        print(f"{100.*undedected/len(answer)}% symbols mismatched")
+        if show_diff:
+            undetected = self.diff(list(answer), list(text))
+        else:
+            undetected = len(answer) - self.quick_lcs(list(answer), list(text))
+        mism_percent = round(100.*undetected/len(answer), 3)
+        print(f"{mism_percent}% symbols mismatched")
+        return mism_percent
+
+    def quick_lcs(self, x: list, y: list):
+        ranges = []
+        ranges.append(len(y))  # I_0 = [0..n]
+        for i in range(len(x)):
+            positions = [j for j, l in enumerate(y) if l == x[i]]
+            positions.reverse()
+            for p in positions:
+                k = bisect(ranges, p)
+                if (k == bisect(ranges, p - 1)):
+                    if (k < len(ranges) - 1):
+                        ranges[k] = p
+                    else:
+                        ranges[k:k] = [p]
+        return len(ranges) - 1
 
     def lcs_matrix(self, a, b):
         """ lcs algorithm using dynamic programming, to recreate differences in a and b.

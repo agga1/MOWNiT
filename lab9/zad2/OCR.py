@@ -1,17 +1,29 @@
+import statistics
 from math import trunc
 from numpy import fft, rot90, multiply
-
+from time import perf_counter
 from zad2.Stats import Stats
 from zad2.parser import parse_alphabet, parse_letters, parse_text, order
 import numpy as np
 
-font = {"consolas": ("../res/consolas150.png", [7, 8, 9, 10]),
-        "courier_new": ("../res/courier_new150.png", [8, 6, 9, 8]),
-        "lucida": ("../res/lucida150.png", [8, 5, 7, 6])  # up down left right
+font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]),
+        "courier_new": ("../res/courier_new150.png", [8, 7, 10, 5]),
+        "lucida120": ("../res/lucida120.png", [5, 5, 7, 10]),  # up down left right
+        "lucida150": ("../res/lucida150.png", [2, 1, 6, 3])
+
         }
 test_answer = "some monospaced text. isnt that amazing?\n" \
               "and yet another line. ok! here: is a more\n" \
               "complicated, one."
+
+test2 = "the correlation operation in 2d is very straight-forward. we just take a filter of a given\n" \
+        "size and place it over a local region in the image having the same size as the filter. we\n" \
+        "continue this operation shifting the same filter through the entire image. this also helps us\n" \
+        "achieve two very popular properties :\n" \
+        "translational invariance: our vision system should be to sense, respond or detect the\n" \
+        "same object regardless of where it appears in the image.\n" \
+        "locality: our vision system focusses on the local regions, without regard to what else is\n" \
+        "happening in other parts of the image."
 
 
 class OCR:
@@ -24,16 +36,22 @@ class OCR:
         """ finds letters in given text (list of tuples: ((x,y), 'a') )
             and return results as Stats object """
         stats = Stats(order, text_name, self.letter_shape)
+        st1 = perf_counter()
         text = parse_text(text_name)
-        text = self.reduce_noise2(text, trunc(50))
+        st11 = perf_counter()
+        k = min(text.shape[0]//3, text.shape[1]//3)
+        text = self.reduce_noise(text, k)
+        st12 = perf_counter()
+        print("svd: ", st12-st11)
 
         # perform fourier transform
-        letters_by_pos = self.find_letters( text, thres=0.9)
+        letters_by_pos = self.find_letters( text, thres=0.916)
         self.clean_duplicates(letters_by_pos, margin=0.5)
 
-
         # map to tuples: ( (x, y) , 'a' )
-        letter_order = list(map( lambda sth: (sth[0], order[sth[1][0]]), letters_by_pos.items()))
+        letter_order = list(map(lambda sth: (sth[0], order[sth[1][0]]), letters_by_pos.items()))
+        st2 = perf_counter()
+        print("ocr time: ",st2-st1)
         stats.add_letters(letter_order)
         return stats
 
@@ -46,9 +64,8 @@ class OCR:
         def flipped_fourier(items, shape):
             items_f = [0] * len(items)
             for i in range(len(items)):
-                items_f[i] = fft.fft2(rot90(items[i], 2), s=(shape[0], shape[1]))
+                items_f[i] = fft.fft2(rot90(items[i], 2), s=shape)
             return items_f
-
         letters_f = flipped_fourier(self.letters, text.shape)
         text_f = fft.fft2(text)
         positions = {}
@@ -89,24 +106,22 @@ class OCR:
         print(U.shape, S.shape, V.shape, smat.shape)
         return np.dot(U, np.dot(smat, V))
 
-    def reduce_noise2(self, matrix, k):
-        U, S, V = np.linalg.svd(matrix, full_matrices=True)  # singular value decomposition
-        Uvcts = np.matrix(U[:, :k])  # first k-t singular vectors
-        Svals = np.diag(S[:k])  # k first singular values
-        Vvcts = np.matrix(V[:k, :])  # transposed k-th vct = k-th column
-        return Uvcts * Svals * Vvcts
 
-
-def check(mfont, text = None):
+def check(mfont, text = None, test_answer =None):
     text = text if text is not None else f"../res/{mfont}_t.png"
     print(f"{mfont} font:")
     ocr = OCR(mfont)
     stats = ocr.parse_text(text)
     stats.circle([let for let in order], False)
     stats.print_text()
-    stats.show_diff(test_answer)
+    if test_answer is not None:
+        stats.compare(test_answer, True)
     print()
 
-check("lucida")
-check("courier_new")
-check("consolas")
+# check("lucida120", "../res/lucida_long120.png")
+check("lucida150", "../res/lucida_long150.png", test2)
+
+# check("courier_new")
+# check("consolas")
+# check("lucida")
+#
