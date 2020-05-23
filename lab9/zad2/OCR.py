@@ -5,6 +5,7 @@ from time import perf_counter
 from zad2.Stats import Stats
 from zad2.parser import parse_alphabet, parse_letters, parse_text, order
 import numpy as np
+import concurrent.futures
 
 font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]),
         "courier_new": ("../res/courier_new150.png", [8, 7, 10, 5]),
@@ -46,11 +47,13 @@ class OCR:
 
         # perform fourier transform
         letters_by_pos = self.find_letters( text, thres=0.916)
+        st13 = perf_counter()
+        print("find letters: ", st13-st12)
         self.clean_duplicates(letters_by_pos, margin=0.5)
-
         # map to tuples: ( (x, y) , 'a' )
         letter_order = list(map(lambda sth: (sth[0], order[sth[1][0]]), letters_by_pos.items()))
         st2 = perf_counter()
+        print("dupl :", st2-st13)
         print("ocr time: ",st2-st1)
         stats.add_letters(letter_order)
         return stats
@@ -62,9 +65,8 @@ class OCR:
             :returns dict (key: (x, y) val: (idx of letter in 'order', correlation) """
 
         def flipped_fourier(items, shape):
-            items_f = [0] * len(items)
-            for i in range(len(items)):
-                items_f[i] = fft.fft2(rot90(items[i], 2), s=shape)
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
+            items_f = list(executor.map(lambda item: fft.fft2(rot90(item, 2), s=shape), items))
             return items_f
         letters_f = flipped_fourier(self.letters, text.shape)
         text_f = fft.fft2(text)
@@ -103,7 +105,7 @@ class OCR:
         U, S, V = np.linalg.svd(matrix, full_matrices=False)  # singular value decomposition
         smat = np.diag(S)
         smat[k:, k:] = 0
-        print(U.shape, S.shape, V.shape, smat.shape)
+        # print(U.shape, S.shape, V.shape, smat.shape)
         return np.dot(U, np.dot(smat, V))
 
 
