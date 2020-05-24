@@ -113,27 +113,30 @@ class Stats:
 
     def diff(self, a, b):
         mx = self.lcs_matrix(a, b)
-        undedected = 0
+        l = 0
+        r = 0
         lines = []
         i, j = len(a) - 1, len(b) - 1
         while i >= 0 and j >= 0:
             if i < 0:
                 lines.append(f">>> [{j}] {b[j]}")
+                l +=1
                 j -= 1
             elif j < 0:
                 lines.append(f"<< [{i}] {a[i]}")
-                undedected += 1
+                r += 1
                 i -= 1
             elif a[i] == b[j]:
                 i, j = i - 1, j - 1
             elif mx[i][j - 1] >= mx[i - 1][j]:
                 lines.append(f">>> [{j}] {b[j]}")
+                l+=1
                 j -= 1
             elif mx[i][j - 1] < mx[i - 1][j]:
                 lines.append(f"<< [{i}] {a[i]}")
-                undedected += 1
+                r += 1
                 i -= 1
         lines.reverse()
         for line in lines:
             print(line)
-        return undedected
+        return max(r,l)

@@ -9,8 +9,8 @@ import concurrent.futures
 
 font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]),
         "courier_new": ("../res/courier_new150.png", [8, 7, 10, 5]),
-        "lucida120": ("../res/lucida120.png", [5, 5, 7, 10]),  # up down left right
-        "lucida150": ("../res/lucida150.png", [2, 1, 6, 3])
+        # "lucida120": ("../res/lucida120.png", [5, 5, 7, 10]),  # up down left right
+        "lucida": ("../res/lucida150.png", [2, 1, 6, 3])
 
         }
 test_answer = "some monospaced text. isnt that amazing?\n" \
@@ -46,12 +46,12 @@ class OCR:
         print("svd: ", st12-st11)
 
         # perform fourier transform
-        letters_by_pos = self.find_letters( text, thres=0.916)
+        pos_idx_corr = self.find_letters( text, thres=0.916)
         st13 = perf_counter()
         print("find letters: ", st13-st12)
-        self.clean_duplicates(letters_by_pos, margin=0.5)
+        pos_idx_corr = self.clean_duplicates(pos_idx_corr, margin=0.5)
         # map to tuples: ( (x, y) , 'a' )
-        letter_order = list(map(lambda sth: (sth[0], order[sth[1][0]]), letters_by_pos.items()))
+        letter_order = list(map(lambda sth: (sth[0], order[sth[1]]), pos_idx_corr))
         st2 = perf_counter()
         print("dupl :", st2-st13)
         print("ocr time: ",st2-st1)
@@ -70,42 +70,56 @@ class OCR:
             return items_f
         letters_f = flipped_fourier(self.letters, text.shape)
         text_f = fft.fft2(text)
-        positions = {}
-        for idx, let_f in enumerate(letters_f):
-            corr = abs(fft.ifft2(multiply(text_f, let_f)))
-            max_corr = np.amax(corr)
-            for i in range(corr.shape[0]):
-                for j in range(corr.shape[1]):
-                    if corr[i, j] >= thres * max_corr:
-                        if positions.get((i, j)) == None:
-                            positions[(i, j)] = (idx, corr[i, j])
-                        elif positions[(i, j)][1] < corr[i, j]:
-                            positions[(i, j)] = (idx, corr[i, j])
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+        positions = list(executor.map(lambda x: self.func(x[0], x[1], text_f, thres), enumerate(letters_f)))
+        positions = [y for x in positions for y in x]
+        # for idx, let_f in enumerate(letters_f):
+        #     corr = abs(fft.ifft2(multiply(text_f, let_f)))
+        #     max_corr = np.amax(corr)
+        #     for i in range(corr.shape[0]):
+        #         for j in range(corr.shape[1]):
+        #             if corr[i, j] >= thres * max_corr:
+        #                 positions.append(((i, j), idx, corr[i, j]))
         return positions
 
-    def clean_duplicates(self, letters_by_pos, margin=0.7):
+    def func(self, idx, let_f, text_f, thres):
+        positions = []
+        corr = abs(fft.ifft2(multiply(text_f, let_f)))
+        max_corr = np.amax(corr)
+        for i in range(corr.shape[0]):
+            for j in range(corr.shape[1]):
+                if corr[i, j] >= thres * max_corr:
+                    positions.append(((i, j), idx, corr[i, j]))
+        return positions
+
+    def clean_duplicates(self, pos_idx_corr, margin=0.7):
         """
-        :param letters_by_pos: dict key: (x,y), val: (idx, corr)
+        :param pos_idx_corr: list of tuples: ((x,y), idx, corr)
         :param margin: how much letters can overlap
         """
         def collide(a, b, shape, margin= 0.7):
             return (abs(a[1] - b[1]) <= shape[1]*margin and
                     abs(a[0] - b[0]) <= shape[0]*margin)
-
-        todel = set()
-        for key, val in letters_by_pos.items():
-            for key2, val2 in letters_by_pos.items():
-                if key2 != key and collide(key, key2, self.letter_shape, margin):
-                    lesser = key2 if val[1] > val2[1] else key
-                    todel.add(lesser)
-        for key in todel:
-            letters_by_pos.pop(key, None)
+        filtered = []
+        print(len(pos_idx_corr))
+        for pos, idx, corr in pos_idx_corr:
+            i = 0
+            too_little = False
+            while i < len(filtered):
+                if collide(filtered[i][0], pos, self.letter_shape, margin):
+                    if filtered[i][2] < corr:
+                        filtered.pop(i)
+                    else:
+                        too_little = True
+                i += 1
+            if not too_little:
+                filtered.append((pos, idx, corr))
+        return filtered
 
     def reduce_noise(self, matrix, k):
         U, S, V = np.linalg.svd(matrix, full_matrices=False)  # singular value decomposition
         smat = np.diag(S)
         smat[k:, k:] = 0
-        # print(U.shape, S.shape, V.shape, smat.shape)
         return np.dot(U, np.dot(smat, V))
 
 
@@ -121,9 +135,9 @@ def check(mfont, text = None, test_answer =None):
     print()
 
 # check("lucida120", "../res/lucida_long120.png")
-check("lucida150", "../res/lucida_long150.png", test2)
-
-# check("courier_new")
-# check("consolas")
-# check("lucida")
+check("lucida", "../res/lucida_long150.png", test2)
+# check("lucida150",  "../res/lucida_t.png", test_answer)
+# check("courier_new", test_answer=test_answer)
+# check("consolas", test_answer=test_answer)
+# check("lucida", test_answer=test_answer)
 #
