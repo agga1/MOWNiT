@@ -19,7 +19,7 @@ def find_pattern(array: np.array, pattern: np.array, threshold: float):
     pattern_f = fft.fft2(rot90(pattern, 2), s=array.shape)
 
     corr = abs(fft.ifft2(array_f * pattern_f))  # pointwise multiplication
-
+    # display_gray(corr)
     max_corr = np.amax(corr)
     classification = (corr >= threshold * max_corr) * 1  # binary array
 

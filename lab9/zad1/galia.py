@@ -11,7 +11,6 @@ result_name = "../out/galia_result.jpg"
 # load, invert and to greyscale
 galia = np.asarray(ImageOps.invert(Image.open(image_name).convert("L")))
 e = np.asarray(ImageOps.invert(Image.open(pattern_name).convert("L")))
-
 plot_fourier(galia)
 
 threshold = 0.9

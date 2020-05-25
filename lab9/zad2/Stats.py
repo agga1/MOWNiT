@@ -3,6 +3,8 @@ from bisect import bisect
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy import rot90
+
 
 class Stats:
     def __init__(self, all_letters, text_name, letter_shape):
@@ -14,6 +16,7 @@ class Stats:
 
         self.text_name = text_name  # for visualization
         self.letter_shape = letter_shape
+        self.rotation = 0
 
     def add_letters(self, pos_letter):
         self.pos_letter = pos_letter
@@ -57,6 +60,7 @@ class Stats:
     def circle(self, letters, show_title=True):
         """ circle chosen letters """
         result = np.array(Image.open(self.text_name).convert("RGB"))
+        result = rot90(result, self.rotation)
         h, w = self.letter_shape
         for pos, let in self.pos_letter:
             if let not in letters:

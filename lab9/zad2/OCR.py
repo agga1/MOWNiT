@@ -1,4 +1,3 @@
-import statistics
 from math import trunc
 from numpy import fft, rot90, multiply
 from time import perf_counter
@@ -6,14 +5,14 @@ from zad2.Stats import Stats
 from zad2.parser import parse_alphabet, parse_letters, parse_text, order
 import numpy as np
 import concurrent.futures
+import matplotlib.pyplot as plt
 
 font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]),
         "courier_new": ("../res/courier_new150.png", [8, 7, 10, 5]),
-        # "lucida120": ("../res/lucida120.png", [5, 5, 7, 10]),  # up down left right
         "lucida": ("../res/lucida150.png", [2, 1, 6, 3])
 
         }
-test_answer = "some monospaced text. isnt that amazing?\n" \
+test_short = "some monospaced text. isnt that amazing?\n" \
               "and yet another line. ok! here: is a more\n" \
               "complicated, one."
 
@@ -46,15 +45,15 @@ class OCR:
         print("svd: ", st12-st11)
 
         # perform fourier transform
-        pos_idx_corr = self.find_letters( text, thres=0.916)
+        pos_idx_corr, stats.rotation = self.find_letters( text, thres=0.916)
         st13 = perf_counter()
-        print("find letters: ", st13-st12)
+        print("find letters time: ", st13-st12)
         pos_idx_corr = self.clean_duplicates(pos_idx_corr, margin=0.5)
         # map to tuples: ( (x, y) , 'a' )
         letter_order = list(map(lambda sth: (sth[0], order[sth[1]]), pos_idx_corr))
         st2 = perf_counter()
-        print("dupl :", st2-st13)
-        print("ocr time: ",st2-st1)
+        print("deleting duplicates time:", st2-st13)
+        print("whole ocr time: ", st2-st1)
         stats.add_letters(letter_order)
         return stats
 
@@ -68,21 +67,32 @@ class OCR:
             executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
             items_f = list(executor.map(lambda item: fft.fft2(rot90(item, 2), s=shape), items))
             return items_f
-        letters_f = flipped_fourier(self.letters, text.shape)
-        text_f = fft.fft2(text)
+        rot = self.get_text_rotation(text)
+        print("detected rotation:", rot)
+        text_f = fft.fft2(rot90(text, rot))
+        letters_f = flipped_fourier(self.letters, text_f.shape)
         executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
-        positions = list(executor.map(lambda x: self.func(x[0], x[1], text_f, thres), enumerate(letters_f)))
+        positions = list(executor.map(lambda x: self.correlation(x[0], x[1], text_f, thres), enumerate(letters_f)))
         positions = [y for x in positions for y in x]
-        # for idx, let_f in enumerate(letters_f):
-        #     corr = abs(fft.ifft2(multiply(text_f, let_f)))
-        #     max_corr = np.amax(corr)
-        #     for i in range(corr.shape[0]):
-        #         for j in range(corr.shape[1]):
-        #             if corr[i, j] >= thres * max_corr:
-        #                 positions.append(((i, j), idx, corr[i, j]))
-        return positions
+        return positions, rot
 
-    def func(self, idx, let_f, text_f, thres):
+    def get_text_rotation(self, text):
+        text_f = fft.fft2(text)
+        e_f = fft.fft2(rot90(self.letters[4], 2), s=text_f.shape)
+        corr = abs(fft.ifft2(multiply(text_f, e_f)))
+        best = 0
+        best_corr = np.amax(corr)
+        for i in range(1, 4):
+            text_f = fft.fft2(rot90(text, i))
+            e_f = fft.fft2(rot90(self.letters[4], 2), s=text_f.shape)
+            corr = abs(fft.ifft2(multiply(text_f, e_f)))
+            max_corr = np.amax(corr)
+            if max_corr > best_corr:
+                best = i
+                best_corr = max_corr
+        return best
+
+    def correlation(self, idx, let_f, text_f, thres):
         positions = []
         corr = abs(fft.ifft2(multiply(text_f, let_f)))
         max_corr = np.amax(corr)
@@ -101,7 +111,7 @@ class OCR:
             return (abs(a[1] - b[1]) <= shape[1]*margin and
                     abs(a[0] - b[0]) <= shape[0]*margin)
         filtered = []
-        print(len(pos_idx_corr))
+        # print(len(pos_idx_corr))
         for pos, idx, corr in pos_idx_corr:
             i = 0
             too_little = False
@@ -123,7 +133,7 @@ class OCR:
         return np.dot(U, np.dot(smat, V))
 
 
-def check(mfont, text = None, test_answer =None):
+def check(mfont, text = None, test_answer =None, print_occ=False):
     text = text if text is not None else f"../res/{mfont}_t.png"
     print(f"{mfont} font:")
     ocr = OCR(mfont)
@@ -132,12 +142,21 @@ def check(mfont, text = None, test_answer =None):
     stats.print_text()
     if test_answer is not None:
         stats.compare(test_answer, True)
+    if print_occ:
+        print(stats.occurences)
     print()
 
-# check("lucida120", "../res/lucida_long120.png")
-check("lucida", "../res/lucida_long150.png", test2)
-# check("lucida150",  "../res/lucida_t.png", test_answer)
-# check("courier_new", test_answer=test_answer)
-# check("consolas", test_answer=test_answer)
-# check("lucida", test_answer=test_answer)
+# klasyczne testy
+check("courier_new", test_answer=test_short)
+check("consolas", test_answer=test_short)
+check("lucida", test_answer=test_short)
+
+# 16 linijek tekstu
+check("lucida", "../res/lucida_vlong.png", test2+"\n"+test2)
+
+# testy obrotów
+check("lucida",  "../res/lucida_t.png", test_short)
+check("lucida",  "../res/lucida_inv.png", test_short)
+check("lucida",  "../res/lr1.png", test_short)
 #
+check("lucida", test_answer=test_short, print_occ=True)
