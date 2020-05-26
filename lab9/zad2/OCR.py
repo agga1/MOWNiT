@@ -1,16 +1,13 @@
-from math import trunc
 from numpy import fft, rot90, multiply
 from time import perf_counter
 from zad2.Stats import Stats
 from zad2.parser import parse_alphabet, parse_letters, parse_text, order
 import numpy as np
 import concurrent.futures
-import matplotlib.pyplot as plt
 
-font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]),
+font = {"consolas": ("../res/consolas150.png", [6, 8, 9, 5]), # font file, cut margins (up down left right)
         "courier_new": ("../res/courier_new150.png", [8, 7, 10, 5]),
         "lucida": ("../res/lucida150.png", [2, 1, 6, 3])
-
         }
 test_short = "some monospaced text. isnt that amazing?\n" \
               "and yet another line. ok! here: is a more\n" \
@@ -71,7 +68,7 @@ class OCR:
         print("detected rotation:", rot)
         text_f = fft.fft2(rot90(text, rot))
         letters_f = flipped_fourier(self.letters, text_f.shape)
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
         positions = list(executor.map(lambda x: self.correlation(x[0], x[1], text_f, thres), enumerate(letters_f)))
         positions = [y for x in positions for y in x]
         return positions, rot
@@ -102,7 +99,7 @@ class OCR:
                     positions.append(((i, j), idx, corr[i, j]))
         return positions
 
-    def clean_duplicates(self, pos_idx_corr, margin=0.7):
+    def clean_duplicates(self, pos_idx_corr, margin=0.75):
         """
         :param pos_idx_corr: list of tuples: ((x,y), idx, corr)
         :param margin: how much letters can overlap
@@ -147,16 +144,20 @@ def check(mfont, text = None, test_answer =None, print_occ=False):
     print()
 
 # klasyczne testy
-check("courier_new", test_answer=test_short)
-check("consolas", test_answer=test_short)
-check("lucida", test_answer=test_short)
+# check("courier_new", test_answer=test_short)
+# check("consolas", test_answer=test_short)
+# check("lucida", test_answer=test_short)
+# 8 linijek szeryfowa
+check("courier_new", "../res/courier_new_long.png", test2)
+# check("lucida", "../res/lucida_long.png", test2)
+# check("consolas", "../res/consolas_long.png", test2)
 
 # 16 linijek tekstu
-check("lucida", "../res/lucida_vlong.png", test2+"\n"+test2)
+# check("lucida", "../res/lucida_vlong.png", test2+"\n"+test2)
 
 # testy obrotów
-check("lucida",  "../res/lucida_t.png", test_short)
-check("lucida",  "../res/lucida_inv.png", test_short)
-check("lucida",  "../res/lr1.png", test_short)
+# check("lucida",  "../res/lucida_t.png", test_short)
+# check("lucida",  "../res/lucida_inv.png", test_short)
+# check("lucida",  "../res/lr.png", test_short)
 #
-check("lucida", test_answer=test_short, print_occ=True)
+# check("lucida", test_answer=test_short, print_occ=True)
