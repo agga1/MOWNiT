@@ -32,7 +32,10 @@ def check_with_lib(span, n, f, title=None):
     print("my: ",my_int, "\ttime:", round(st2-st1, 6))
     print()
 
+# na podstawie poniższych testów możemy stwierdzić, że metoda złożonego simpsona
+# daje nam całkiem dobre przybliżenie w bardzo szybkim czasie (jest szybsza od funkcji bibliotecznych).
 
+check_with_lib([1, 100], 100, f1, "f1")
 check_with_lib([1, 100], 1000, f1, "f1")
 check_with_lib([1, 100], 10000, f1, "f1")
 check_with_lib([1, 100], 100000, f1, "f1")
